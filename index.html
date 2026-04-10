@@ -2,42 +2,38 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>CV Builder — Profesional</title>
+<!-- Fuentes Apple-like -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
+<!-- Librería PDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
-  /* ─── RESET & BASE ─────────────────────────────────────── */
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  /* ─── RESET & VARIABLES ─────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
   :root {
-    --bg:        #F7F7F5;
+    --bg:        #F2F2F0; /* Un gris cálido muy Apple */
     --surface:   #FFFFFF;
-    --border:    #E8E8E4;
-    --border-mid:#D0D0CA;
-    --ink:       #0D0D0D;
-    --ink-2:     #3A3A38;
-    --ink-3:     #7A7A75;
-    --ink-4:     #ADADAA;
-    --accent:    #0D0D0D;
-    --pill-bg:   #EFEFEC;
-
-    --chat-user-bg: #0D0D0D;
-    --chat-user-ink:#FFFFFF;
+    --border:    #E5E5E3;
+    --ink:       #111111;
+    --ink-2:     #444444;
+    --ink-3:     #888888;
+    --accent:    #000000;
+    
+    --chat-user-bg: #000000;
+    --chat-user-ink: #FFFFFF;
     --chat-bot-bg:  #FFFFFF;
-    --chat-bot-ink: #0D0D0D;
+    --chat-bot-ink: #111111;
 
-    --radius-sm: 10px;
-    --radius-md: 16px;
-    --radius-lg: 24px;
-
-    --font-body: 'DM Sans', system-ui, sans-serif;
+    --font-body: 'DM Sans', system-ui, -apple-system, sans-serif;
     --font-display: 'DM Serif Display', Georgia, serif;
 
-    --progress-h: 3px;
-    --ease: cubic-bezier(.4,0,.2,1);
+    --radius-md: 18px;
+    --radius-lg: 24px;
+    --ease: cubic-bezier(.25, .8, .25, 1);
   }
 
   html, body {
@@ -46,838 +42,522 @@
     background: var(--bg);
     color: var(--ink);
     -webkit-font-smoothing: antialiased;
+    overflow: hidden; /* Evitar scroll en body, usamos scroll interno */
   }
 
-  /* ─── LAYOUT ───────────────────────────────────────────── */
+  /* ─── LAYOUT MOBILE FIRST ────────────────────────────────── */
   .app {
-    display: grid;
-    grid-template-rows: var(--progress-h) 52px 1fr;
+    display: flex;
+    flex-direction: column;
     height: 100vh;
-    overflow: hidden;
+    position: relative;
   }
 
-  /* ─── PROGRESS BAR ─────────────────────────────────────── */
+  /* Barra de Progreso */
   .progress-track {
     background: var(--border);
     width: 100%;
+    height: 4px;
+    z-index: 20;
   }
   .progress-fill {
     height: 100%;
     background: var(--ink);
     width: 0%;
-    transition: width .6s var(--ease);
+    transition: width .4s var(--ease);
   }
 
-  /* ─── TOPBAR ───────────────────────────────────────────── */
+  /* Header fijo */
   .topbar {
+    height: 60px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 28px;
+    padding: 0 20px;
+    background: rgba(242,242,240,.9);
+    backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--border);
-    background: rgba(247,247,245,.85);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    position: relative;
+    flex-shrink: 0;
     z-index: 10;
   }
   .topbar-brand {
     display: flex;
     align-items: center;
-    gap: 9px;
+    gap: 10px;
   }
-  .topbar-icon {
-    width: 22px; height: 22px;
-    border: 1.5px solid var(--ink);
-    border-radius: 6px;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .topbar-icon svg { width: 11px; height: 11px; }
   .topbar-name {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 600;
-    letter-spacing: -.02em;
-    color: var(--ink);
+    letter-spacing: -0.02em;
   }
   .topbar-step {
     font-size: 12px;
-    font-weight: 400;
     color: var(--ink-3);
-    letter-spacing: 0.01em;
+    font-weight: 500;
   }
+  
+  /* Botón Descarga (Header) */
   .btn-download {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
     background: var(--ink);
     color: #fff;
     border: none;
-    border-radius: 100px;
-    padding: 8px 18px;
-    font-family: var(--font-body);
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    opacity: .35;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    opacity: 0.3;
     pointer-events: none;
-    transition: opacity .25s, transform .15s;
-    letter-spacing: -.01em;
+    transition: opacity 0.3s;
+    white-space: nowrap;
   }
   .btn-download.active {
     opacity: 1;
     pointer-events: all;
   }
-  .btn-download:hover { transform: scale(1.03); }
-  .btn-download svg { width: 14px; height: 14px; }
 
-  /* ─── MAIN CONTENT ─────────────────────────────────────── */
-  .main {
-    display: grid;
-    grid-template-columns: 60fr 40fr;
+  /* Área Principal (Contenedor de Chat y Preview) */
+  .main-container {
+    flex: 1;
+    position: relative;
     overflow: hidden;
+    display: flex;
   }
 
-  /* ─── CHAT PANEL ───────────────────────────────────────── */
+  /* ─── CHAT PANEL (Pantalla principal móvil) ─────────────── */
   .chat-panel {
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
-    border-right: 1px solid var(--border);
-    overflow: hidden;
     background: var(--bg);
+    z-index: 5;
+    transition: transform 0.4s var(--ease);
   }
+  
+  /* Estado deslizado en móvil (cuando se ve el preview) */
+  .chat-panel.swiped-out {
+    transform: translateX(-20%); /* Efecto paralaje ligero */
+  }
+
   .chat-messages {
     flex: 1;
     overflow-y: auto;
-    padding: 32px 36px 16px;
+    padding: 20px 16px;
     display: flex;
     flex-direction: column;
-    gap: 14px;
-    scroll-behavior: smooth;
+    gap: 16px;
+    padding-bottom: 80px; /* Espacio para el input */
   }
-  .chat-messages::-webkit-scrollbar { width: 4px; }
-  .chat-messages::-webkit-scrollbar-track { background: transparent; }
-  .chat-messages::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 4px; }
-
-  /* Bubble */
+  
+  /* Burbujas */
   .bubble {
-    max-width: 75%;
+    max-width: 85%;
     padding: 12px 16px;
     border-radius: var(--radius-md);
-    font-size: 14.5px;
-    line-height: 1.6;
-    animation: bubbleIn .3s var(--ease) both;
-    position: relative;
+    font-size: 15px;
+    line-height: 1.5;
+    animation: popIn 0.3s var(--ease) both;
   }
-  @keyframes bubbleIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
+  @keyframes popIn { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+
   .bubble-bot {
     background: var(--chat-bot-bg);
     color: var(--chat-bot-ink);
-    border: 1px solid var(--border);
-    align-self: flex-start;
     border-bottom-left-radius: 4px;
+    align-self: flex-start;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   }
   .bubble-user {
     background: var(--chat-user-bg);
     color: var(--chat-user-ink);
-    align-self: flex-end;
     border-bottom-right-radius: 4px;
+    align-self: flex-end;
   }
-  .bubble-hint {
-    font-size: 12px;
-    color: var(--ink-3);
-    align-self: flex-start;
-    padding: 0 4px;
-    animation: bubbleIn .3s var(--ease) both;
-  }
-  .typing-indicator {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    padding: 14px 16px;
-    background: var(--chat-bot-bg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    border-bottom-left-radius: 4px;
-    align-self: flex-start;
-    animation: bubbleIn .2s var(--ease) both;
-  }
-  .dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--ink-4);
-    animation: dotBounce 1.2s infinite;
-  }
-  .dot:nth-child(2) { animation-delay: .2s; }
-  .dot:nth-child(3) { animation-delay: .4s; }
-  @keyframes dotBounce {
-    0%,80%,100% { transform: translateY(0); background: var(--ink-4); }
-    40%         { transform: translateY(-5px); background: var(--ink-2); }
-  }
+  .bubble strong { font-weight: 600; color: #000; }
 
-  /* Quick-reply chips */
-  .chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    align-self: flex-start;
-    animation: bubbleIn .35s var(--ease) .1s both;
-  }
-  .chip {
-    background: var(--surface);
-    border: 1px solid var(--border-mid);
-    border-radius: 100px;
-    padding: 8px 16px;
-    font-size: 13.5px;
-    font-family: var(--font-body);
-    font-weight: 500;
-    color: var(--ink-2);
-    cursor: pointer;
-    transition: background .15s, border-color .15s, color .15s;
-  }
-  .chip:hover {
-    background: var(--ink);
-    border-color: var(--ink);
-    color: #fff;
-  }
-
-  /* ─── INPUT AREA ───────────────────────────────────────── */
+  /* Input Area */
   .chat-input-area {
-    padding: 16px 36px 20px;
-    border-top: 1px solid var(--border);
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
     background: var(--bg);
+    padding: 12px 16px 24px; /* Padding extra abajo para iPhones modernos */
+    border-top: 1px solid var(--border);
+    z-index: 20;
   }
-  .input-row {
+  .input-wrapper {
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 24px;
     display: flex;
     align-items: flex-end;
-    gap: 10px;
-    background: var(--surface);
-    border: 1px solid var(--border-mid);
-    border-radius: var(--radius-md);
-    padding: 10px 12px 10px 16px;
-    transition: border-color .2s;
+    padding: 8px 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    transition: border-color 0.2s;
   }
-  .input-row:focus-within {
-    border-color: var(--ink);
-  }
-  .chat-textarea {
+  .input-wrapper:focus-within { border-color: #000; }
+  
+  textarea {
     flex: 1;
     border: none;
     background: transparent;
     resize: none;
     font-family: var(--font-body);
-    font-size: 14.5px;
-    color: var(--ink);
-    line-height: 1.5;
-    max-height: 120px;
+    font-size: 16px; /* Evita zoom en iOS */
+    max-height: 100px;
     outline: none;
-    min-height: 24px;
+    padding: 4px 0;
+    line-height: 1.4;
   }
-  .chat-textarea::placeholder { color: var(--ink-4); }
+  
   .btn-send {
-    width: 34px; height: 34px;
-    border-radius: 10px;
-    background: var(--ink);
+    width: 32px; height: 32px;
+    background: #000;
     border: none;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin-left: 8px;
+    margin-bottom: 2px;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    transition: transform .15s, opacity .2s;
-    opacity: .5;
+    opacity: 0.4;
+    transition: opacity 0.2s, transform 0.1s;
   }
   .btn-send.ready { opacity: 1; }
-  .btn-send:hover { transform: scale(1.08); }
+  .btn-send:active { transform: scale(0.9); }
   .btn-send svg { width: 14px; height: 14px; fill: #fff; }
-  .input-helper {
-    margin-top: 8px;
-    font-size: 11.5px;
-    color: var(--ink-4);
-    text-align: center;
+
+  /* Chips (Botones rápidos) */
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; animation: popIn 0.3s 0.1s both; }
+  .chip {
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .chip:active { background: #f0f0f0; transform: scale(0.96); }
+
+  /* ─── PREVIEW PANEL (Pantalla secundaria móvil) ─────────── */
+  .preview-panel {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: var(--bg);
+    z-index: 50;
+    display: none; /* Oculto por defecto en móvil */
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.4s var(--ease);
+  }
+  
+  .preview-panel.active {
+    display: flex;
+    transform: translateX(0);
   }
 
-  /* ─── CV PREVIEW PANEL ─────────────────────────────────── */
-  .preview-panel {
-    background: var(--bg);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
   .preview-header {
-    padding: 16px 24px 14px;
-    border-bottom: 1px solid var(--border);
+    height: 60px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    flex-shrink: 0;
+    padding: 0 20px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(242,242,240,.9);
+    backdrop-filter: blur(10px);
   }
-  .preview-label {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: .08em;
-    text-transform: uppercase;
-    color: var(--ink-3);
+  .btn-close-preview {
+    background: none; border: none; font-size: 15px; font-weight: 600; cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
   }
-  .preview-badge {
-    font-size: 11px;
-    color: var(--ink-4);
-    background: var(--pill-bg);
-    padding: 3px 9px;
-    border-radius: 100px;
-  }
+
+  /* Área de scroll del CV */
   .preview-scroll {
     flex: 1;
     overflow-y: auto;
+    display: flex;
+    justify-content: center;
     padding: 20px;
-    display: flex;
-    justify-content: center;
+    background: #e5e5e5; /* Fondo más oscuro para resaltar el papel */
   }
-  .preview-scroll::-webkit-scrollbar { width: 4px; }
-  .preview-scroll::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 4px; }
 
-  /* A4 Canvas */
+  /* ─── EL CV (A4 Canvas) ──────────────────────────────────── */
+  /* En pantalla móvil: pequeño para caber, pero con scroll */
   .cv-a4 {
-    width: 100%;
-    max-width: 440px;
-    aspect-ratio: 210 / 297;
     background: #fff;
-    box-shadow: 0 2px 24px rgba(0,0,0,.10), 0 0 0 1px rgba(0,0,0,.05);
-    border-radius: 4px;
-    padding: 40px 36px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 8.5px;
+    width: 100%;
+    max-width: 450px; /* Ancho máximo visual en móvil */
+    min-height: 297mm; /* Altura mínima A4 */
+    aspect-ratio: 210 / 297;
+    padding: 40px 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    font-family: var(--font-body);
+    font-size: 10px; /* Texto pequeño para que quepa todo en pantalla */
     color: #111;
-    overflow: hidden;
-    position: relative;
-    transition: all .3s var(--ease);
     display: flex;
     flex-direction: column;
-    gap: 0;
+    gap: 12px;
+    transform-origin: top center;
+    transition: all 0.3s ease;
   }
 
-  /* CV Sections */
-  .cv-name {
-    font-family: 'DM Serif Display', serif;
-    font-size: 22px;
-    letter-spacing: -.02em;
-    line-height: 1.1;
-    color: #000;
-    margin-bottom: 2px;
-    transition: all .3s var(--ease);
-  }
-  .cv-title {
-    font-size: 9px;
-    font-weight: 500;
-    color: #444;
-    letter-spacing: .02em;
-    margin-bottom: 10px;
-    transition: all .3s var(--ease);
-  }
-  .cv-contact-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px 14px;
-    font-size: 7.5px;
-    color: #555;
-    padding-bottom: 10px;
-    border-bottom: 1.5px solid #000;
-    margin-bottom: 10px;
-  }
-  .cv-contact-item { display: flex; align-items: center; gap: 3px; }
-  .cv-section {
-    margin-bottom: 10px;
-    transition: all .3s var(--ease);
-    animation: fadeSlide .4s var(--ease) both;
-  }
-  @keyframes fadeSlide {
-    from { opacity: 0; transform: translateY(6px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  .cv-section-title {
-    font-size: 7px;
-    font-weight: 700;
-    letter-spacing: .12em;
-    text-transform: uppercase;
-    color: #000;
-    border-bottom: .75px solid #000;
-    padding-bottom: 2px;
-    margin-bottom: 6px;
-  }
-  .cv-summary-text {
-    font-size: 8px;
-    line-height: 1.6;
-    color: #333;
-  }
-  .cv-skills-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 3px 6px;
-    font-size: 7.5px;
-    color: #333;
-  }
-  .cv-skill-tag {
-    background: #F0F0EE;
-    padding: 1.5px 6px;
-    border-radius: 2px;
-    font-size: 7px;
-  }
-  .cv-exp-item { margin-bottom: 6px; }
-  .cv-exp-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 1px;
-  }
-  .cv-exp-role {
-    font-size: 8.5px;
-    font-weight: 600;
-    color: #000;
-  }
-  .cv-exp-dates {
-    font-size: 7px;
-    color: #666;
-    white-space: nowrap;
-  }
-  .cv-exp-company {
-    font-size: 7.5px;
-    color: #555;
-    font-weight: 500;
-    margin-bottom: 2px;
-  }
-  .cv-exp-desc {
-    font-size: 7.5px;
-    line-height: 1.55;
-    color: #333;
-  }
-  .cv-edu-item { margin-bottom: 4px; }
-  .cv-edu-degree { font-size: 8.5px; font-weight: 600; }
-  .cv-edu-school { font-size: 7.5px; color: #555; }
-  .cv-edu-year { font-size: 7px; color: #777; }
-  .cv-extras-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 6px;
-  }
-  .cv-extras-label { font-size: 7px; font-weight: 700; color: #000; margin-bottom: 2px; text-transform: uppercase; letter-spacing: .08em; }
-  .cv-extras-val { font-size: 7.5px; color: #333; line-height: 1.5; }
-  .cv-placeholder {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    gap: 10px;
-    color: #CACAC8;
-  }
-  .cv-placeholder svg { width: 28px; height: 28px; opacity: .4; }
-  .cv-placeholder-text { font-size: 9px; letter-spacing: .05em; text-transform: uppercase; }
-
-  /* ─── EMPTY STATE ──────────────────────────────────────── */
-  .cv-empty {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    opacity: .35;
+  /* CLASE MÁGICA PARA PDF: Activa esto SOLO al generar PDF */
+  /* Esto fuerza al navegador a renderizar a tamaño real A4 físico */
+  .cv-a4.pdf-mode {
+    width: 210mm !important;
+    height: 297mm !important;
+    max-width: none !important;
+    font-size: 11pt !important; /* Tamaño de lectura cómoda en papel */
+    padding: 20mm !important;
+    box-shadow: none !important;
+    margin: 0 !important;
   }
 
-  /* ─── RESPONSIVE ───────────────────────────────────────── */
-  @media (max-width: 768px) {
-    .main { grid-template-columns: 1fr; }
-    .preview-panel { display: none; }
-    .topbar { padding: 0 16px; }
-    .chat-messages { padding: 20px 16px 12px; }
-    .chat-input-area { padding: 12px 16px 16px; }
+  /* Estilos internos del CV */
+  .cv-name { font-family: var(--font-display); font-size: 28px; line-height: 1.1; margin-bottom: 4px; }
+  .cv-title { font-size: 12px; font-weight: 600; color: #555; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .cv-contact { font-size: 10px; color: #444; margin-bottom: 16px; border-bottom: 1px solid #000; padding-bottom: 12px; display: flex; flex-wrap: wrap; gap: 12px; }
+  .cv-sec-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; border-bottom: 1px solid #ddd; padding-bottom: 4px; margin-top: 8px; }
+  .cv-text { font-size: 10px; line-height: 1.5; color: #222; }
+  .cv-list { display: flex; flex-wrap: wrap; gap: 6px; }
+  .cv-tag { background: #f4f4f4; padding: 2px 6px; border-radius: 4px; font-size: 9px; }
+  .cv-item { margin-bottom: 12px; }
+  .cv-item-head { display: flex; justify-content: space-between; margin-bottom: 2px; }
+  .cv-role { font-weight: 700; font-size: 11px; }
+  .cv-date { font-size: 9px; color: #666; }
+  .cv-company { font-style: italic; color: #555; margin-bottom: 4px; font-size: 10px; }
+  
+  /* Botón Flotante Móvil */
+  .mobile-fab {
+    position: fixed;
+    bottom: 100px;
+    right: 20px;
+    width: 56px; height: 56px;
+    background: #000;
+    border-radius: 50%;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 30;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.3s var(--ease);
   }
+  .mobile-fab:active { transform: scale(0.9); }
+  .mobile-fab svg { width: 24px; height: 24px; fill: #fff; }
+
+  /* Ocultar FAB cuando el chat input tiene foco para no tapar */
+  .chat-input-area:focus-within ~ .mobile-fab { transform: translateY(100px); opacity: 0; }
+
+  /* ─── DESKTOP TWEAKS (Si se abre en PC) ─────────────────── */
+  @media (min-width: 1024px) {
+    .app { flex-direction: row; }
+    .topbar { width: 60px; height: 100vh; flex-direction: column; justify-content: flex-start; padding-top: 20px; border-right: 1px solid var(--border); border-bottom: none; }
+    .topbar-brand { flex-direction: column; transform: rotate(-90deg); margin-bottom: 40px; white-space: nowrap; }
+    .progress-track { width: 4px; height: 100%; position: absolute; top: 0; left: 0; }
+    .progress-fill { width: 100%; height: 0%; transition: height .4s var(--ease); }
+    .main-container { flex: 1; }
+    .chat-panel { width: 40%; border-right: 1px solid var(--border); }
+    .preview-panel { 
+      position: static; 
+      display: flex; 
+      width: 60%; 
+      transform: none !important; 
+      background: #e5e5e5;
+    }
+    .preview-header { display: none; }
+    .mobile-fab { display: none; }
+    .cv-a4 { transform: scale(0.85); margin-top: 20px; } /* Escalar un poco para verlo todo en PC */
+    .btn-download { width: 40px; height: 40px; padding: 0; justify-content: center; border-radius: 50%; }
+    .btn-download span { display: none; } /* Ocultar texto en PC, solo icono */
+  }
+
 </style>
 </head>
 <body>
 
-<div class="app" id="app">
-
-  <!-- PROGRESS BAR -->
-  <div class="progress-track">
-    <div class="progress-fill" id="progressFill"></div>
-  </div>
-
-  <!-- TOPBAR -->
+<div class="app">
+  <!-- BARRA LATERAL (Desktop) / SUPERIOR (Mobile) -->
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  
   <header class="topbar">
     <div class="topbar-brand">
-      <div class="topbar-icon">
-        <svg viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="1" y="1" width="9" height="1.5" rx=".75" fill="#0D0D0D"/>
-          <rect x="1" y="4.25" width="6" height="1.5" rx=".75" fill="#0D0D0D"/>
-          <rect x="1" y="7.5" width="7.5" height="1.5" rx=".75" fill="#0D0D0D"/>
-        </svg>
-      </div>
-      <span class="topbar-name">CV Builder</span>
-    </div>
-    <span class="topbar-step" id="topbarStep">Paso 1 de 9</span>
-    <button class="btn-download" id="btnDownload" onclick="downloadPDF()">
-      <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M7 1v8M4 6.5l3 3 3-3M2 11h10" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+        <line x1="16" y1="13" x2="8" y2="13"></line>
+        <line x1="16" y1="17" x2="8" y2="17"></line>
+        <polyline points="10 9 9 9 8 9"></polyline>
       </svg>
-      Descargar PDF
+      <span class="topbar-name">CV Pro</span>
+    </div>
+    <div class="topbar-step" id="topbarStep">0%</div>
+    <button class="btn-download" id="btnDownload" onclick="downloadPDF()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+        <polyline points="7 10 12 15 17 10"></polyline>
+        <line x1="12" y1="15" x2="12" y2="3"></line>
+      </svg>
+      <span>Descargar</span>
     </button>
   </header>
 
-  <!-- MAIN -->
-  <div class="main">
-
-    <!-- ── CHAT PANEL ── -->
-    <section class="chat-panel">
+  <!-- CONTENEDOR PRINCIPAL -->
+  <div class="main-container">
+    
+    <!-- PANEL CHAT -->
+    <section class="chat-panel" id="chatPanel">
       <div class="chat-messages" id="chatMessages"></div>
+      
       <div class="chat-input-area">
-        <div class="input-row">
-          <textarea
-            class="chat-textarea"
-            id="chatInput"
-            rows="1"
-            placeholder="Escribe tu respuesta…"
-            onkeydown="handleKey(event)"
-            oninput="autoResize(this); toggleSend()"
-          ></textarea>
+        <div class="input-wrapper">
+          <textarea id="chatInput" rows="1" placeholder="Escribe aquí..." oninput="autoResize(this); toggleSend()" onkeydown="handleKey(event)"></textarea>
           <button class="btn-send" id="btnSend" onclick="submitInput()">
-            <svg viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg">
-              <path d="M7 12V2M2.5 6.5L7 2l4.5 4.5" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-            </svg>
+            <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
         </div>
-        <p class="input-helper">Pulsa Enter para enviar · Shift+Enter para nueva línea</p>
       </div>
     </section>
 
-    <!-- ── CV PREVIEW PANEL ── -->
-    <section class="preview-panel">
+    <!-- BOTÓN FLOTANTE MÓVIL -->
+    <button class="mobile-fab" onclick="togglePreview()">
+      <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+    </button>
+
+    <!-- PANEL VISTA PREVIA -->
+    <section class="preview-panel" id="previewPanel">
       <div class="preview-header">
-        <span class="preview-label">Vista Previa</span>
-        <span class="preview-badge" id="previewBadge">En blanco</span>
+        <span style="font-weight:600; font-size:14px;">Vista Previa</span>
+        <button class="btn-close-preview" onclick="togglePreview()">
+          Cerrar <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
       </div>
       <div class="preview-scroll">
         <div class="cv-a4" id="cvPreview">
-          <div class="cv-empty" id="cvEmpty">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V9l-6-6z" stroke="#0D0D0D" stroke-width="1.5" stroke-linecap="round"/>
-              <path d="M14 3v6h6M8 13h8M8 17h5" stroke="#0D0D0D" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
-            <span class="cv-placeholder-text">Tu CV aparecerá aquí</span>
-          </div>
+           <!-- El contenido del CV se genera aquí con JS -->
         </div>
       </div>
     </section>
 
-  </div><!-- /main -->
-</div><!-- /app -->
+  </div>
+</div>
 
-<!-- ═══════════════════════════════════════════════════════════
-     JAVASCRIPT — Chat Wizard Logic
-═══════════════════════════════════════════════════════════ -->
 <script>
-/* ──────────────────────────────────────────────
-   STATE — el objeto central de toda la entrevista
-   ────────────────────────────────────────────── */
+/* ───── ESTADO ───── */
 const state = {
-  name: '',
-  email: '',
-  phone: '',
-  location: '',
-  linkedin: '',
-  title: '',
-  summary: '',
-  skills: [],
-  experience: [],     // [{role, company, dates, description}]
-  education: [],      // [{degree, school, year}]
-  languages: '',
-  tools: '',
+  name: '', title: '', contact: '', summary: '', skills: '',
+  exp: [], edu: '', lang: '', tools: ''
 };
+let stepIdx = 0;
+let tempExp = {};
 
-// Experiencia temporal mientras se recopila
-let currentExp = {};
-let currentEdu = {};
-let expCount = 0;
-let eduCount = 0;
-
-/* ──────────────────────────────────────────────
-   WIZARD STEPS — definición granular de cada paso
-   step: identificador único
-   progress: % para la barra
-   botMsg: mensaje del bot
-   hint: texto de ayuda debajo del campo
-   field: campo del state a rellenar (o null si es especial)
-   chips: opciones rápidas (opcional)
-   ────────────────────────────────────────────── */
+/* ───── PASOS DEL CHAT (Wizard) ───── */
 const STEPS = [
-  /* 0 */ {
-    step: 'welcome',
-    progress: 0,
-    label: 'Bienvenida',
-    botMsg: '👋 Hola, soy tu experto en CV. Vamos a construir uno profesional, limpio y optimizado para ATS.\n\n¿Cómo te llamas? Empieza con tu nombre completo.',
-    hint: 'Ej: María García López',
-    field: 'name',
-  },
-  /* 1 */ {
-    step: 'email',
-    progress: 10,
-    label: 'Contacto',
-    botMsg: 'Perfecto, {name}. 🎯\n\nAhora tu email profesional.',
-    hint: 'Ej: maria@email.com',
-    field: 'email',
-  },
-  /* 2 */ {
-    step: 'phone',
-    progress: 12,
-    label: 'Contacto',
-    botMsg: '¿Y tu número de teléfono?',
-    hint: 'Ej: +34 600 000 000',
-    field: 'phone',
-  },
-  /* 3 */ {
-    step: 'location',
-    progress: 14,
-    label: 'Contacto',
-    botMsg: '¿Dónde estás ubicado/a? (ciudad y país).',
-    hint: 'Ej: Barcelona, España',
-    field: 'location',
-  },
-  /* 4 */ {
-    step: 'linkedin',
-    progress: 16,
-    label: 'Contacto',
-    botMsg: '¿Tienes perfil de LinkedIn? (opcional — puedes escribir «no» para saltarlo)',
-    hint: 'Ej: linkedin.com/in/mariagarcia',
-    field: 'linkedin',
-    optional: true,
-  },
-  /* 5 */ {
-    step: 'title',
-    progress: 22,
-    label: 'Titular',
-    botMsg: '¡Contacto listo! ✅\n\nAhora el **titular profesional** — esa frase poderosa que te define. Sé específico/a con tu rol y valor.\n\nEj: «Directora de Marketing Digital con 8 años escalando marcas B2C».',
-    hint: 'Tu titular debe ser concreto y cuantificable',
-    field: 'title',
-  },
-  /* 6 */ {
-    step: 'summary',
-    progress: 32,
-    label: 'Resumen',
-    botMsg: '💬 Escribe tu **resumen profesional** (3-5 líneas). Habla de tu especialidad, tus logros más importantes y qué aportas. Escribe en primera persona implícita (sin "Yo").',
-    hint: 'Concéntrate en tu propuesta de valor única',
-    field: 'summary',
-    multiline: true,
-  },
-  /* 7 */ {
-    step: 'skills',
-    progress: 42,
-    label: 'Habilidades',
-    botMsg: '⚡ Lista tus **habilidades clave** separadas por comas. Mezcla hard skills y soft skills.\n\nEj: Liderazgo de equipos, Python, SQL, Inglés C1, Gestión ágil de proyectos.',
-    hint: 'Entre 5 y 12 habilidades es ideal para ATS',
-    field: 'skills',
-  },
-  /* 8 */ {
-    step: 'exp_role',
-    progress: 50,
-    label: 'Experiencia',
-    botMsg: '💼 Empecemos con tu experiencia. ¿Cuál es (o fue) tu **puesto de trabajo más reciente**?',
-    hint: 'Ej: Product Manager Senior',
-    field: null, // especial — se gestiona aparte
-  },
-  /* 9 */ {
-    step: 'exp_company',
-    progress: 53,
-    label: 'Experiencia',
-    botMsg: '¿En qué empresa?',
-    hint: 'Ej: Accenture',
-    field: null,
-  },
-  /* 10 */ {
-    step: 'exp_dates',
-    progress: 56,
-    label: 'Experiencia',
-    botMsg: '¿Cuáles fueron las fechas? (inicio — fin o «Actualidad»)',
-    hint: 'Ej: Ene 2021 – Actualidad',
-    field: null,
-  },
-  /* 11 */ {
-    step: 'exp_desc',
-    progress: 60,
-    label: 'Experiencia',
-    botMsg: '📝 Describe tus **responsabilidades y logros medibles** en ese puesto.\n\n💡 Tip: Usa verbos de acción: *Lideré, Aumenté, Reduje, Implementé, Desarrollé, Coordiné, Optimicé…* e incluye números.',
-    hint: 'Ej: Lideré un equipo de 8 personas y aumenté las ventas un 34% en 12 meses.',
-    field: null,
-    multiline: true,
-  },
-  /* 12 */ {
-    step: 'exp_more',
-    progress: 64,
-    label: 'Experiencia',
-    botMsg: '¿Tienes otro trabajo relevante que quieras añadir?',
-    hint: null,
-    field: null,
-    chips: ['✅ Sí, añadir otro', '➡️ No, continuar'],
-  },
-  /* 13 */ {
-    step: 'edu_degree',
-    progress: 80,
-    label: 'Formación',
-    botMsg: '🎓 Formación académica. ¿Cuál es tu **titulación más relevante**?',
-    hint: 'Ej: Grado en Administración de Empresas',
-    field: null,
-  },
-  /* 14 */ {
-    step: 'edu_school',
-    progress: 83,
-    label: 'Formación',
-    botMsg: '¿En qué universidad o centro?',
-    hint: 'Ej: Universidad Autónoma de Barcelona',
-    field: null,
-  },
-  /* 15 */ {
-    step: 'edu_year',
-    progress: 86,
-    label: 'Formación',
-    botMsg: '¿Año de finalización?',
-    hint: 'Ej: 2018 (o «En curso»)',
-    field: null,
-  },
-  /* 16 */ {
-    step: 'languages',
-    progress: 92,
-    label: 'Extras',
-    botMsg: '🌍 **Idiomas** — indica cada idioma y tu nivel.\n\nEj: Español (nativo), Inglés (C1 — avanzado), Francés (B2).',
-    hint: 'Separa cada idioma con coma o punto y coma',
-    field: 'languages',
-  },
-  /* 17 */ {
-    step: 'tools',
-    progress: 96,
-    label: 'Herramientas',
-    botMsg: '🛠️ **Herramientas y Tecnologías** — ¿con qué software, plataformas o tecnologías trabajas habitualmente?',
-    hint: 'Ej: Salesforce, HubSpot, Jira, Figma, Google Analytics, Office 365',
-    field: 'tools',
-  },
-  /* 18 */ {
-    step: 'done',
-    progress: 100,
-    label: 'Completado',
-    botMsg: '🎉 ¡Todo listo! Tu CV está completo y optimizado. Revisa la vista previa a la derecha.\n\nCuando estés satisfecho/a, pulsa **«Descargar PDF»** en la barra superior para guardar tu CV profesional.',
-    field: null,
-  },
+  { p: 5,  q: "¡Hola! 👋 Vamos a crear tu CV profesional. Empecemos fácil: ¿Cuál es tu nombre completo?", f: 'name' },
+  { p: 15, q: "Encantado, {name}. Ahora necesito tu **Titular Profesional** (una frase potente). Ej: 'Desarrollador Web Full Stack'.", f: 'title' },
+  { p: 25, q: "Perfecto. Escribe tu **Email y Teléfono** separados por un espacio.", f: 'contact' },
+  { p: 35, q: "Hablemos de tu perfil. Escribe un **Resumen Profesional** breve (3-4 líneas) destacando tu experiencia. *Tip: No empieces con 'Soy...', ve directo al grano.*", f: 'summary', multi: true },
+  { p: 50, q: "Lista tus **Habilidades Clave** separadas por comas. Ej: JavaScript, Liderazgo, Inglés, SEO.", f: 'skills' },
+  
+  // Experiencia (Loop simple para este MVP)
+  { p: 60, q: "Ahora tu experiencia. ¿Cuál es tu **puesto actual**?", f: 'role' },
+  { p: 70, q: "¿En qué **empresa** trabajas y cuáles son las **fechas**?", f: 'comp' },
+  { p: 80, q: "Describe tus **logros** en ese puesto. Usa números si puedes. *La IA limpiará el texto por ti.*", f: 'desc', multi: true },
+  
+  { p: 90, q: "¿Qué **idiomas** hablas y tu nivel? (Opcional)", f: 'lang' },
+  { p: 95, q: "¿Qué **herramientas o software** dominas? (Opcional)", f: 'tools' },
+  { p: 100,q: "¡Genial! 🎉 Tu CV está listo. Revisa la vista previa y descarga tu PDF en A4.", end: true }
 ];
 
-let currentStepIdx = 0;       // índice en STEPS
-let waitingForChip = false;   // si estamos esperando chip de sí/no
-let addingMoreExp = false;    // para el loop de experiencia
-
-/* ──────────────────────────────────────────────
-   OPTIMIZADOR DE TEXTO (simula IA)
-   Limpia, capitaliza y pule el texto del usuario
-   ────────────────────────────────────────────── */
-function optimizeText(text) {
-  if (!text) return text;
+/* ───── LÓGICA "IA" (SIMULADA CLIENTE) ───── */
+// Esta función imita a una IA eliminando el "Yo" y capitalizando
+function smartPolish(text, type) {
+  if (!text) return '';
   let t = text.trim();
-  // Capitaliza primera letra
-  t = t.charAt(0).toUpperCase() + t.slice(1);
-  // Elimina espacios múltiples
-  t = t.replace(/\s{2,}/g, ' ');
-  // Asegura punto final en párrafos largos
-  if (t.length > 40 && !/[.!?]$/.test(t)) {
-    // No añadir punto a habilidades/herramientas (contienen comas)
-    if (!t.includes(',')) t += '.';
+  
+  // Eliminar "Soy ", "Estoy ", "Tengo " al inicio si es resumen o experiencia
+  if (type === 'summary' || type === 'desc') {
+    t = t.replace(/^(Soy |Estoy |Tengo |He |Mi experiencia es )/i, '');
   }
+  
+  // Capitalizar primera letra
+  t = t.charAt(0).toUpperCase() + t.slice(1);
+  
+  // Quitar espacios dobles
+  t = t.replace(/\s+/g, ' ');
+  
+  // Asegurar punto final si es párrafo
+  if ((type === 'summary' || type === 'desc') && !t.endsWith('.')) {
+    t += '.';
+  }
+  
   return t;
 }
 
-function optimizeList(text) {
-  return text.split(/[,;]+/)
-    .map(s => s.trim())
-    .filter(Boolean)
-    .map(s => s.charAt(0).toUpperCase() + s.slice(1));
-}
-
-/* ──────────────────────────────────────────────
-   CHAT UI HELPERS
-   ────────────────────────────────────────────── */
-const chatMessages = document.getElementById('chatMessages');
-const chatInput    = document.getElementById('chatInput');
-const btnSend      = document.getElementById('btnSend');
-const progressFill = document.getElementById('progressFill');
-const topbarStep   = document.getElementById('topbarStep');
-const btnDownload  = document.getElementById('btnDownload');
-const previewBadge = document.getElementById('previewBadge');
-
-function scrollChat() {
-  chatMessages.scrollTop = chatMessages.scrollHeight;
-}
-
-function addBubble(text, type = 'bot', delay = 0) {
-  return new Promise(resolve => {
-    setTimeout(() => {
-      const el = document.createElement('div');
-      el.className = `bubble bubble-${type}`;
-      // Parsear negritas con **...**
-      el.innerHTML = text
-        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.+?)\*/g, '<em>$1</em>')
-        .replace(/\n/g, '<br>');
-      chatMessages.appendChild(el);
-      scrollChat();
-      resolve(el);
-    }, delay);
-  });
-}
-
-function addHint(text) {
-  const el = document.createElement('div');
-  el.className = 'bubble-hint';
-  el.textContent = `💡 ${text}`;
-  chatMessages.appendChild(el);
-  scrollChat();
-}
-
-function addChips(options, onSelect) {
-  const wrap = document.createElement('div');
-  wrap.className = 'chips';
-  waitingForChip = true;
-  options.forEach(opt => {
-    const btn = document.createElement('button');
-    btn.className = 'chip';
-    btn.textContent = opt;
-    btn.onclick = () => {
-      wrap.remove();
-      waitingForChip = false;
-      onSelect(opt);
-    };
-    wrap.appendChild(btn);
-  });
-  chatMessages.appendChild(wrap);
-  scrollChat();
-}
-
-async function showTyping(ms = 700) {
-  const el = document.createElement('div');
-  el.className = 'typing-indicator';
-  el.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
-  chatMessages.appendChild(el);
-  scrollChat();
-  await wait(ms);
-  el.remove();
-}
+/* ───── UI HELPERS ───── */
+const dom = {
+  msgs: document.getElementById('chatMessages'),
+  input: document.getElementById('chatInput'),
+  fill: document.getElementById('progressFill'),
+  step: document.getElementById('topbarStep'),
+  cv: document.getElementById('cvPreview'),
+  dlBtn: document.getElementById('btnDownload'),
+  chatPanel: document.getElementById('chatPanel'),
+  prevPanel: document.getElementById('previewPanel')
+};
 
 function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
 
+function addMsg(text, isUser = false) {
+  const div = document.createElement('div');
+  div.className = `bubble ${isUser ? 'bubble-user' : 'bubble-bot'}`;
+  // Soporte básico de negritas con **
+  div.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+  dom.msgs.appendChild(div);
+  dom.msgs.scrollTop = dom.msgs.scrollHeight;
+}
+
+async function runStep() {
+  const s = STEPS[stepIdx];
+  dom.fill.style.width = s.p + '%';
+  dom.step.innerText = s.p + '%';
+  
+  if (s.end) {
+    dom.input.style.display = 'none';
+    document.getElementById('btnSend').style.display = 'none';
+    dom.dlBtn.classList.add('active');
+    addMsg(s.q);
+    renderCV(); // Render final
+    return;
+  }
+
+  // Simular "escribiendo..."
+  const typing = document.createElement('div');
+  typing.className = 'bubble bubble-bot';
+  typing.innerHTML = '<span style="animation: pulse 1s infinite">●</span>';
+  dom.msgs.appendChild(typing);
+  dom.msgs.scrollTop = dom.msgs.scrollHeight;
+  
+  await wait(600); // Pausa natural
+  typing.remove();
+
+  // Reemplazar {name} si existe
+  let q = s.q.replace('{name}', state.name.split(' ')[0]);
+  addMsg(q);
+  dom.input.focus();
+}
+
 function autoResize(el) {
   el.style.height = 'auto';
-  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+  el.style.height = el.scrollHeight + 'px';
 }
 
 function toggleSend() {
-  const v = chatInput.value.trim();
-  btnSend.classList.toggle('ready', v.length > 0);
+  document.getElementById('btnSend').classList.toggle('ready', dom.input.value.trim().length > 0);
 }
 
 function handleKey(e) {
@@ -887,294 +567,108 @@ function handleKey(e) {
   }
 }
 
-function setProgress(pct) {
-  progressFill.style.width = pct + '%';
+/* ───── PROCESAR RESPUESTA ───── */
+function submitInput() {
+  const raw = dom.input.value.trim();
+  if (!raw) return;
+  
+  dom.input.value = '';
+  dom.input.style.height = 'auto';
+  toggleSend();
+  
+  addMsg(raw, true);
+  processInput(raw);
+  
+  stepIdx++;
+  if (stepIdx < STEPS.length) runStep();
 }
 
-/* ──────────────────────────────────────────────
-   WIZARD ENGINE — avanza paso a paso
-   ────────────────────────────────────────────── */
-async function goToStep(idx) {
-  if (idx >= STEPS.length) return;
-  currentStepIdx = idx;
-  const step = STEPS[idx];
+function processInput(txt) {
+  const s = STEPS[stepIdx];
+  const polished = smartPolish(txt, s.f);
 
-  // Actualizar barra y topbar
-  setProgress(step.progress);
-  topbarStep.textContent = `${step.label} · ${step.progress}%`;
-
-  // Mostrar indicador de escritura
-  await showTyping(550 + Math.random() * 250);
-
-  // Interpolar {name} en el mensaje
-  const msg = step.botMsg.replace('{name}', state.name.split(' ')[0]);
-  await addBubble(msg, 'bot');
-
-  // Mostrar hint si existe
-  if (step.hint) addHint(step.hint);
-
-  // Mostrar chips si el paso los tiene
-  if (step.chips) {
-    chatInput.style.display = 'none'; // ocultar input cuando hay chips
-    btnSend.style.display = 'none';
-    addChips(step.chips, handleChipResponse);
-  } else if (step.step === 'done') {
-    // Paso final: ocultar input, activar botón descarga
-    chatInput.style.display = 'none';
-    btnSend.style.display = 'none';
-    btnDownload.classList.add('active');
-    previewBadge.textContent = 'Listo para descargar';
-  } else {
-    chatInput.style.display = '';
-    btnSend.style.display = '';
-    chatInput.placeholder = step.hint || 'Escribe aquí…';
-    chatInput.focus();
-  }
+  // Guardar en state
+  if (s.f === 'role') tempExp.role = polished;
+  else if (s.f === 'comp') tempExp.comp = polished;
+  else if (s.f === 'desc') { tempExp.desc = polished; state.exp.push({...tempExp}); tempExp = {}; }
+  else state[s.f] = polished;
+  
+  renderCV();
 }
 
-/* Maneja la respuesta a chips (Sí/No para más experiencia) */
-async function handleChipResponse(choice) {
-  const isYes = choice.includes('Sí');
-  await addBubble(choice, 'user');
-
-  if (currentStepIdx === STEPS.findIndex(s => s.step === 'exp_more')) {
-    if (isYes) {
-      // Loop: volver al inicio de exp
-      addingMoreExp = true;
-      currentExp = {};
-      const expRoleIdx = STEPS.findIndex(s => s.step === 'exp_role');
-      await goToStep(expRoleIdx);
-    } else {
-      // Continuar con educación
-      const eduIdx = STEPS.findIndex(s => s.step === 'edu_degree');
-      await goToStep(eduIdx);
-    }
-  }
-}
-
-/* Procesa el input del usuario */
-async function submitInput() {
-  const raw = chatInput.value.trim();
-  if (!raw && !waitingForChip) return;
-
-  chatInput.value = '';
-  chatInput.style.height = 'auto';
-  btnSend.classList.remove('ready');
-
-  const step = STEPS[currentStepIdx];
-
-  // Muestra la burbuja del usuario
-  await addBubble(raw, 'user');
-
-  // Guardar valor en state según el paso
-  await processAnswer(step, raw);
-
-  // Actualizar la vista previa
-  renderPreview();
-
-  // Siguiente paso
-  const nextIdx = getNextStepIdx(currentStepIdx, raw);
-  if (nextIdx !== null) {
-    await goToStep(nextIdx);
-  }
-}
-
-async function processAnswer(step, raw) {
-  const val = optimizeText(raw);
-
-  switch (step.step) {
-    case 'welcome':  state.name     = val; break;
-    case 'email':    state.email    = val.toLowerCase(); break;
-    case 'phone':    state.phone    = val; break;
-    case 'location': state.location = val; break;
-    case 'linkedin':
-      state.linkedin = (raw.toLowerCase() === 'no' || raw.toLowerCase() === 'skip') ? '' : val;
-      break;
-    case 'title':   state.title   = val; break;
-    case 'summary': state.summary = val; break;
-    case 'skills':  state.skills  = optimizeList(raw); break;
-
-    /* Experiencia — acumular en objeto temporal */
-    case 'exp_role':    currentExp.role        = val; break;
-    case 'exp_company': currentExp.company     = val; break;
-    case 'exp_dates':   currentExp.dates       = val; break;
-    case 'exp_desc':
-      currentExp.description = val;
-      state.experience.push({ ...currentExp });
-      currentExp = {};
-      expCount++;
-      break;
-
-    /* Formación */
-    case 'edu_degree': currentEdu.degree = val; break;
-    case 'edu_school': currentEdu.school = val; break;
-    case 'edu_year':
-      currentEdu.year = val;
-      state.education.push({ ...currentEdu });
-      currentEdu = {};
-      break;
-
-    case 'languages': state.languages = val; break;
-    case 'tools':     state.tools     = val; break;
-  }
-}
-
-/* Calcula el siguiente índice de step — maneja el loop de experiencia */
-function getNextStepIdx(idx, raw) {
-  // Si estamos en exp_desc y venimos de "añadir más", volver al prompt de ¿más exp?
-  if (STEPS[idx].step === 'exp_desc') {
-    return STEPS.findIndex(s => s.step === 'exp_more');
-  }
-  return idx + 1 < STEPS.length ? idx + 1 : null;
-}
-
-/* ──────────────────────────────────────────────
-   CV RENDERER — actualiza la vista previa A4
-   ────────────────────────────────────────────── */
-function renderPreview() {
-  const cv = document.getElementById('cvPreview');
-  const empty = document.getElementById('cvEmpty');
-
-  // Una vez que tenemos nombre, mostramos el CV
-  if (!state.name) return;
-  if (empty) empty.style.display = 'none';
-  previewBadge.textContent = 'Actualizando…';
-
-  const hasContact = state.email || state.phone || state.location || state.linkedin;
-  const hasSkills  = state.skills.length > 0;
-  const hasExp     = state.experience.length > 0;
-  const hasEdu     = state.education.length > 0;
-  const hasExtras  = state.languages || state.tools;
-
-  cv.innerHTML = `
-    <!-- NOMBRE Y TITULAR -->
-    <div class="cv-name">${esc(state.name)}</div>
-    ${state.title ? `<div class="cv-title">${esc(state.title)}</div>` : ''}
-
-    <!-- CONTACTO -->
-    ${hasContact ? `
-    <div class="cv-contact-row">
-      ${state.email    ? `<span class="cv-contact-item">✉ ${esc(state.email)}</span>` : ''}
-      ${state.phone    ? `<span class="cv-contact-item">☏ ${esc(state.phone)}</span>` : ''}
-      ${state.location ? `<span class="cv-contact-item">⌖ ${esc(state.location)}</span>` : ''}
-      ${state.linkedin ? `<span class="cv-contact-item">in ${esc(state.linkedin)}</span>` : ''}
-    </div>` : '<div style="border-bottom:1.5px solid #000;margin-bottom:10px;"></div>'}
-
-    <!-- RESUMEN -->
-    ${state.summary ? `
-    <div class="cv-section">
-      <div class="cv-section-title">Perfil Profesional</div>
-      <div class="cv-summary-text">${esc(state.summary)}</div>
-    </div>` : ''}
-
-    <!-- HABILIDADES -->
-    ${hasSkills ? `
-    <div class="cv-section">
-      <div class="cv-section-title">Habilidades</div>
-      <div class="cv-skills-list">
-        ${state.skills.map(s => `<span class="cv-skill-tag">${esc(s)}</span>`).join('')}
-      </div>
-    </div>` : ''}
-
-    <!-- EXPERIENCIA -->
-    ${hasExp ? `
-    <div class="cv-section">
-      <div class="cv-section-title">Experiencia Profesional</div>
-      ${state.experience.map(exp => `
-        <div class="cv-exp-item">
-          <div class="cv-exp-header">
-            <span class="cv-exp-role">${esc(exp.role)}</span>
-            <span class="cv-exp-dates">${esc(exp.dates)}</span>
-          </div>
-          <div class="cv-exp-company">${esc(exp.company)}</div>
-          <div class="cv-exp-desc">${esc(exp.description)}</div>
+/* ───── RENDERIZADO CV (HTML) ───── */
+function renderCV() {
+  const d = (txt) => txt ? `<div class="cv-text">${txt}</div>` : '';
+  
+  let html = `
+    <div class="cv-name">${state.name || 'Tu Nombre'}</div>
+    <div class="cv-title">${state.title || 'Tu Título Profesional'}</div>
+    <div class="cv-contact">${state.contact || 'email@ejemplo.com | +34 600 000 000'}</div>
+    
+    ${state.summary ? `<div class="cv-sec-title">Perfil</div>${d(state.summary)}` : ''}
+    
+    ${state.skills ? `<div class="cv-sec-title">Habilidades</div><div class="cv-list">${state.skills.split(',').map(s=>`<span class="cv-tag">${s.trim()}</span>`).join('')}</div>` : ''}
+    
+    ${state.exp.length ? `<div class="cv-sec-title">Experiencia</div>
+      ${state.exp.map(e => `
+        <div class="cv-item">
+          <div class="cv-item-head"><span class="cv-role">${e.role}</span><span class="cv-date">${e.comp.split('|').pop()||''}</span></div>
+          <div class="cv-company">${e.comp.split('|')[0]||''}</div>
+          ${d(e.desc)}
         </div>
       `).join('')}
-    </div>` : ''}
-
-    <!-- FORMACIÓN -->
-    ${hasEdu ? `
-    <div class="cv-section">
-      <div class="cv-section-title">Formación Académica</div>
-      ${state.education.map(edu => `
-        <div class="cv-edu-item">
-          <div class="cv-edu-degree">${esc(edu.degree)}</div>
-          <div class="cv-edu-school">${esc(edu.school)}</div>
-          <div class="cv-edu-year">${esc(edu.year)}</div>
-        </div>
-      `).join('')}
-    </div>` : ''}
-
-    <!-- IDIOMAS Y HERRAMIENTAS -->
-    ${hasExtras ? `
-    <div class="cv-section">
-      <div class="cv-section-title">Información Adicional</div>
-      <div class="cv-extras-grid">
-        ${state.languages ? `
-        <div>
-          <div class="cv-extras-label">Idiomas</div>
-          <div class="cv-extras-val">${esc(state.languages)}</div>
-        </div>` : ''}
-        ${state.tools ? `
-        <div>
-          <div class="cv-extras-label">Herramientas</div>
-          <div class="cv-extras-val">${esc(state.tools)}</div>
-        </div>` : ''}
-      </div>
-    </div>` : ''}
+    ` : ''}
+    
+    <div style="display:flex; gap:20px;">
+      ${state.lang ? `<div style="flex:1"><div class="cv-sec-title">Idiomas</div>${d(state.lang)}</div>` : ''}
+      ${state.tools ? `<div style="flex:1"><div class="cv-sec-title">Herramientas</div>${d(state.tools)}</div>` : ''}
+    </div>
   `;
-
-  setTimeout(() => {
-    previewBadge.textContent = hasExp ? 'En progreso' : 'Iniciado';
-  }, 300);
+  
+  dom.cv.innerHTML = html;
 }
 
-/* Escapa HTML para prevenir XSS en el renderizado */
-function esc(str) {
-  if (!str) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+/* ───── TOGGLE MÓVIL ───── */
+function togglePreview() {
+  dom.prevPanel.classList.toggle('active');
+  if (dom.prevPanel.classList.contains('active')) {
+    dom.chatPanel.classList.add('swiped-out');
+  } else {
+    dom.chatPanel.classList.remove('swiped-out');
+  }
 }
 
-/* ──────────────────────────────────────────────
-   PDF DOWNLOAD — usa html2pdf.js
-   ────────────────────────────────────────────── */
+/* ───── GENERAR PDF (TRUCO A4) ───── */
 async function downloadPDF() {
-  const cv = document.getElementById('cvPreview');
   const btn = document.getElementById('btnDownload');
-  btn.textContent = 'Generando…';
-  btn.style.opacity = '.6';
-  btn.style.pointerEvents = 'none';
-
+  const originalText = btn.innerHTML;
+  btn.innerHTML = '...';
+  
+  // 1. Activar modo PDF (Forzar tamaño real A4)
+  dom.cv.classList.add('pdf-mode');
+  
+  // Esperar un poco a que el CSS renderice el cambio de tamaño
+  await wait(500);
+  
   const opt = {
-    margin:       0,
-    filename:     `CV_${state.name.replace(/\s+/g, '_')}.pdf`,
-    image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 3, useCORS: true, backgroundColor: '#ffffff' },
-    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    pagebreak:    { mode: 'avoid-all' },
+    margin: 0,
+    filename: `CV_${state.name.replace(' ','_')}.pdf`,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true }, // Scale 2 es suficiente con el tamaño real
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
   };
-
-  await html2pdf().set(opt).from(cv).save();
-
-  await wait(800);
-  btn.innerHTML = `<svg viewBox="0 0 14 14" fill="none"><path d="M7 1v8M4 6.5l3 3 3-3M2 11h10" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Descargar PDF`;
-  btn.style.opacity = '1';
-  btn.style.pointerEvents = 'all';
+  
+  // 2. Generar
+  await html2pdf().set(opt).from(dom.cv).save();
+  
+  // 3. Volver a modo visual (móvil)
+  dom.cv.classList.remove('pdf-mode');
+  btn.innerHTML = originalText;
 }
 
-/* ──────────────────────────────────────────────
-   INIT — arranca el wizard al cargar la página
-   ────────────────────────────────────────────── */
-async function init() {
-  await wait(400); // pequeño delay de entrada
-  await goToStep(0);
-}
+/* ───── INICIAR ───── */
+runStep();
 
-init();
 </script>
 </body>
 </html>
