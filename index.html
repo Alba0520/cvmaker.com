@@ -1,465 +1,772 @@
+```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>CV Builder Pro</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<style>
-  /* ─── CORE VARIABLES ─────────────────────────────────── */
-  :root {
-    --bg: #F5F5F7; /* Apple Light Gray */
-    --surface: #FFFFFF;
-    --text-main: #1D1D1F;
-    --text-sec: #86868B;
-    --accent: #0071E3; /* Apple Blue */
-    --accent-dark: #005BB5;
-    --error: #FF3B30;
-    --border: #D2D2D7;
-    
-    --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-display: 'DM Serif Display', serif;
-    
-    --shadow: 0 4px 20px rgba(0,0,0,0.08);
-    --radius: 20px;
-  }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>CV · Asistente</title>
+    <!-- Fuentes & Librerías -->
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        /* —— variables y reset —— */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  body { margin: 0; font-family: var(--font-body); background: var(--bg); color: var(--text-main); height: 100vh; overflow: hidden; }
+        :root {
+            --bg-light: #F5F5F7;
+            --card-bg: #FFFFFF;
+            --text-primary: #1C1C1E;
+            --text-secondary: #6C6C70;
+            --accent: #007AFF;
+            --error-bg: #FFE5E5;
+            --error-text: #C00;
+            --bot-bubble: #FFFFFF;
+            --user-bubble: #007AFF;
+            --border-light: rgba(0,0,0,0.05);
+            --shadow-sm: 0 4px 12px rgba(0,0,0,0.04);
+            --shadow-md: 0 8px 30px rgba(0,0,0,0.12);
+            --backdrop-blur: blur(10px);
+            --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-serif: 'DM Serif Display', Georgia, serif;
+        }
 
-  /* ─── LANDING PAGE (Nueva Pantalla de Inicio) ──────────── */
-  #landing-page {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: var(--bg);
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    z-index: 1000;
-    padding: 20px;
-    text-align: center;
-    transition: opacity 0.5s ease, transform 0.5s ease;
-  }
-  #landing-page.hidden {
-    opacity: 0; pointer-events: none;
-    transform: scale(0.95);
-  }
-  .landing-logo {
-    width: 80px; height: 80px; background: #000; border-radius: 20px;
-    display: flex; align-items: center; justify-content: center;
-    margin-bottom: 24px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-  }
-  .landing-logo svg { width: 40px; height: 40px; fill: #fff; }
-  .landing-title { font-family: var(--font-display); font-size: 3rem; line-height: 1.1; margin-bottom: 16px; }
-  .landing-sub { color: var(--text-sec); font-size: 1.2rem; max-width: 400px; line-height: 1.5; margin-bottom: 40px; }
-  .btn-start {
-    background: #000; color: #fff; border: none;
-    font-size: 1.1rem; font-weight: 600; padding: 16px 40px;
-    border-radius: 50px; cursor: pointer;
-    transition: transform 0.2s, background 0.2s;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-  }
-  .btn-start:active { transform: scale(0.96); }
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-light);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            margin: 0;
+            line-height: 1.5;
+        }
 
-  /* ─── APP CONTAINER ───────────────────────────────────── */
-  #app-container {
-    display: none; /* Oculto hasta empezar */
-    flex-direction: column; height: 100%; width: 100%;
-    opacity: 0; transition: opacity 0.5s ease 0.3s;
-  }
-  #app-container.visible { opacity: 1; }
+        /* —— contenedores principales —— */
+        #landing-page {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            width: 100%;
+            max-width: 520px;
+            margin: 0 auto;
+            text-align: center;
+            padding: 24px;
+            transition: opacity 0.35s ease, transform 0.35s ease;
+            opacity: 1;
+            transform: translateY(0);
+        }
 
-  /* HEADER */
-  header {
-    height: 60px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between;
-    background: rgba(245,245,247,0.9); backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--border); z-index: 20; flex-shrink: 0;
-  }
-  .brand { font-weight: 700; font-size: 18px; display: flex; align-items: center; gap: 8px; }
-  .progress-bar-container { flex: 1; margin: 0 20px; height: 6px; background: #E5E5EA; border-radius: 3px; overflow: hidden; }
-  .progress-bar-fill { height: 100%; background: var(--text-main); width: 0%; transition: width 0.4s ease; }
+        #landing-page.hidden {
+            display: none;
+            opacity: 0;
+            pointer-events: none;
+        }
 
-  /* MAIN CONTENT GRID */
-  .main-grid { flex: 1; display: flex; overflow: hidden; position: relative; }
+        #app-container {
+            display: none;
+            flex-direction: column;
+            width: 100%;
+            max-width: 860px;
+            margin: 0 auto;
+            height: 100vh;
+            max-height: 780px;
+            background: transparent;
+            border-radius: 32px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            backdrop-filter: none;
+            transition: opacity 0.35s ease;
+        }
 
-  /* CHAT AREA */
-  .chat-area { flex: 1; display: flex; flex-direction: column; background: var(--bg); max-width: 100%; }
-  .messages {
-    flex: 1; overflow-y: auto; padding: 20px;
-    display: flex; flex-direction: column; gap: 16px;
-    padding-bottom: 100px; /* Espacio para el input móvil */
-  }
-  
-  /* Bubbles */
-  .msg {
-    max-width: 85%; padding: 14px 18px; border-radius: 20px;
-    font-size: 16px; line-height: 1.5; animation: msgIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  }
-  @keyframes msgIn { from { opacity: 0; transform: translateY(10px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
-  
-  .msg.bot { background: #fff; color: var(--text-main); border-bottom-left-radius: 4px; align-self: flex-start; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-  .msg.user { background: #000; color: #fff; border-bottom-right-radius: 4px; align-self: flex-end; }
-  .msg.error { background: #FFF0F0; color: #FF3B30; border: 1px solid #FFCCCC; align-self: flex-start; font-size: 14px; }
+        #app-container.visible {
+            display: flex;
+        }
 
-  /* INPUT AREA */
-  .input-area {
-    position: absolute; bottom: 0; left: 0; width: 100%;
-    background: rgba(255,255,255,0.95); border-top: 1px solid var(--border);
-    padding: 12px 16px 30px; /* Padding extra para notches */
-    display: flex; gap: 10px; align-items: flex-end;
-    z-index: 30;
-  }
-  textarea {
-    flex: 1; border: 1px solid #C7C7CC; border-radius: 20px; padding: 12px 16px;
-    font-family: var(--font-body); font-size: 16px; resize: none; max-height: 120px;
-    background: #F2F2F7; outline: none; transition: border 0.2s;
-  }
-  textarea:focus { border-color: var(--accent); background: #fff; }
-  .btn-send {
-    width: 44px; height: 44px; border-radius: 50%; background: var(--accent); color: #fff;
-    border: none; display: flex; align-items: center; justify-content: center; cursor: pointer;
-    opacity: 0.5; transition: opacity 0.2s;
-  }
-  .btn-send.ready { opacity: 1; }
+        /* —— landing —— */
+        .landing-title {
+            font-family: var(--font-serif);
+            font-size: 3.4rem;
+            font-weight: 400;
+            letter-spacing: -0.02em;
+            margin-bottom: 16px;
+            color: #1D1D1F;
+        }
 
-  /* ─── PREVIEW PANEL (Mobile Overlay) ───────────────────── */
-  .preview-panel {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: #E5E5EA; z-index: 50;
-    display: flex; flex-direction: column;
-    transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  .preview-panel.open { transform: translateY(0); }
-  
-  .preview-header {
-    height: 60px; background: #fff; border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: space-between; padding: 0 20px;
-    flex-shrink: 0;
-  }
-  .close-btn { font-size: 16px; font-weight: 600; color: var(--accent); background: none; border: none; cursor: pointer; }
-  
-  .preview-scroll { flex: 1; overflow-y: auto; padding: 20px; display: flex; justify-content: center; }
+        .landing-sub {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 48px;
+            font-weight: 400;
+        }
 
-  /* CV A4 CANVAS */
-  .cv-page {
-    background: #fff; width: 100%; max-width: 450px; 
-    min-height: 297mm; /* A4 Height */
-    aspect-ratio: 210/297;
-    padding: 30px; box-shadow: var(--shadow);
-    font-family: var(--font-body); color: #000;
-    transform-origin: top center;
-  }
-  
-  /* PDF MODE: Forzar tamaño real al descargar */
-  .cv-page.pdf-mode {
-    width: 210mm !important; height: 297mm !important; max-width: none !important;
-    transform: none !important; padding: 20mm !important;
-    font-size: 11pt !important;
-  }
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 16px 36px;
+            border-radius: 60px;
+            font-size: 1.25rem;
+            font-weight: 500;
+            font-family: var(--font-sans);
+            box-shadow: 0 4px 14px rgba(0,122,255,0.3);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(4px);
+        }
 
-  /* CV Styling Internal */
-  .cv-name { font-family: var(--font-display); font-size: 32px; line-height: 1.1; margin-bottom: 8px; }
-  .cv-head { border-bottom: 2px solid #000; padding-bottom: 15px; margin-bottom: 20px; }
-  .cv-title { font-size: 14px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; color: #444; }
-  .cv-contact { margin-top: 8px; font-size: 11px; color: #555; }
-  .cv-section { margin-bottom: 24px; }
-  .cv-sec-title { font-size: 12px; font-weight: 700; text-transform: uppercase; border-bottom: 1px solid #ddd; padding-bottom: 5px; margin-bottom: 12px; letter-spacing: 0.5px; }
-  .cv-text { font-size: 11px; line-height: 1.6; color: #222; }
-  .cv-item { margin-bottom: 16px; }
-  .cv-role { font-weight: 700; font-size: 13px; }
-  .cv-date { float: right; font-size: 11px; color: #666; font-weight: 500; }
+        .btn-primary:active {
+            transform: scale(0.97);
+            box-shadow: 0 2px 8px rgba(0,122,255,0.4);
+        }
 
-  /* ─── MOBILE ACTION BAR (Bottom Bar) ──────────────────── */
-  /* En lugar de un botón flotante, una barra completa estilo app nativa */
-  .mobile-action-bar {
-    position: fixed; bottom: 0; left: 0; width: 100%;
-    background: rgba(255,255,255,0.9); backdrop-filter: blur(10px);
-    border-top: 1px solid var(--border);
-    padding: 12px 20px 30px; /* Safe area */
-    display: flex; justify-content: space-between; align-items: center;
-    z-index: 40;
-    transform: translateY(100%); transition: transform 0.3s;
-  }
-  /* Mostrar barra solo cuando el input NO tiene foco */
-  .input-area:not(:focus-within) ~ .mobile-action-bar { transform: translateY(0); }
-  
-  .btn-preview-action {
-    flex: 1; background: #F2F2F7; color: #000; border: none;
-    padding: 14px; border-radius: 12px; font-weight: 600; font-size: 15px;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    cursor: pointer;
-  }
-  .btn-preview-action:active { background: #E5E5EA; }
+        /* —— cabecera app —— */
+        .app-header {
+            background: rgba(245,245,247,0.75);
+            backdrop-filter: var(--backdrop-blur);
+            -webkit-backdrop-filter: var(--backdrop-blur);
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
 
-  /* Desktop Adjustments */
-  @media (min-width: 1024px) {
-    .preview-panel { 
-      position: static; transform: none !important; width: 45%; 
-      border-left: 1px solid var(--border); display: flex; background: #E5E5EA;
-    }
-    .preview-header { display: none; }
-    .chat-area { max-width: 55%; border-right: 1px solid var(--border); }
-    .mobile-action-bar { display: none; }
-    .cv-page { transform: scale(0.9); margin-top: 20px; }
-  }
-</style>
+        .progress-container {
+            flex: 1;
+            height: 6px;
+            background: rgba(0,0,0,0.06);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--accent);
+            border-radius: 20px;
+            transition: width 0.3s ease;
+        }
+
+        .step-indicator {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* —— grid principal —— */
+        .main-grid {
+            flex: 1;
+            display: flex;
+            background: transparent;
+            padding: 16px;
+            gap: 16px;
+            min-height: 0;
+        }
+
+        /* chat panel */
+        .chat-panel {
+            flex: 1.2;
+            background: var(--card-bg);
+            border-radius: 28px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            backdrop-filter: blur(2px);
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            scroll-behavior: smooth;
+        }
+
+        .bubble {
+            max-width: 85%;
+            padding: 14px 18px;
+            border-radius: 22px;
+            font-size: 1rem;
+            line-height: 1.45;
+            word-break: break-word;
+        }
+
+        .bot-bubble {
+            align-self: flex-start;
+            background: var(--bot-bubble);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid rgba(0,0,0,0.02);
+            color: var(--text-primary);
+            border-bottom-left-radius: 6px;
+        }
+
+        .user-bubble {
+            align-self: flex-end;
+            background: var(--user-bubble);
+            color: white;
+            border-bottom-right-radius: 6px;
+        }
+
+        .error-bubble {
+            background: var(--error-bg);
+            color: var(--error-text);
+            border-left: 3px solid var(--error-text);
+            font-weight: 500;
+            align-self: flex-start;
+        }
+
+        .chat-input-area {
+            padding: 16px 16px 20px;
+            background: var(--card-bg);
+            border-top: 1px solid var(--border-light);
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 10px;
+            background: #F2F2F6;
+            border-radius: 40px;
+            padding: 6px 6px 6px 22px;
+            align-items: center;
+        }
+
+        .input-wrapper input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 14px 0;
+            font-size: 1rem;
+            font-family: var(--font-sans);
+            outline: none;
+            color: var(--text-primary);
+        }
+
+        .input-wrapper input::placeholder {
+            color: #8E8E93;
+        }
+
+        .send-btn {
+            background: var(--accent);
+            border: none;
+            width: 48px;
+            height: 48px;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: 0.15s;
+            box-shadow: 0 2px 8px rgba(0,122,255,0.3);
+        }
+
+        .send-btn:active {
+            transform: scale(0.92);
+        }
+
+        .send-btn.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        /* —— preview panel (desktop visible, mobile modal) —— */
+        .preview-panel {
+            flex: 1;
+            background: var(--card-bg);
+            border-radius: 28px;
+            box-shadow: var(--shadow-sm);
+            padding: 20px 18px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cv-preview {
+            font-family: var(--font-sans);
+            color: #1e1e1f;
+        }
+
+        .cv-name {
+            font-family: var(--font-serif);
+            font-size: 2.1rem;
+            font-weight: 400;
+            margin-bottom: 4px;
+            letter-spacing: -0.02em;
+        }
+
+        .cv-title {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            border-bottom: 1px solid #E5E5EA;
+            padding-bottom: 16px;
+        }
+
+        .cv-section-title {
+            font-weight: 600;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            margin: 18px 0 8px;
+            color: #3A3A3C;
+        }
+
+        .cv-text {
+            margin-bottom: 8px;
+        }
+
+        /* —— pdf mode —— */
+        #cv-preview-container.pdf-mode {
+            width: 210mm !important;
+            height: 297mm !important;
+            font-size: 11pt !important;
+            padding: 20mm !important;
+            background: white;
+            box-sizing: border-box;
+            overflow: visible;
+        }
+
+        /* mobile action */
+        .mobile-preview-bar {
+            display: none;
+        }
+
+        /* —— bottom sheet modal —— */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 1000;
+            display: flex;
+            align-items: flex-end;
+            visibility: hidden;
+            opacity: 0;
+            transition: 0.25s ease;
+        }
+
+        .modal-overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .bottom-sheet {
+            background: var(--card-bg);
+            width: 100%;
+            max-height: 90vh;
+            border-radius: 32px 32px 0 0;
+            padding: 20px 18px 28px;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.2,0.9,0.4,1);
+            overflow-y: auto;
+            box-shadow: 0 -8px 30px rgba(0,0,0,0.2);
+        }
+
+        .modal-overlay.active .bottom-sheet {
+            transform: translateY(0);
+        }
+
+        .sheet-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .sheet-header h3 {
+            font-weight: 500;
+            font-size: 1.4rem;
+        }
+
+        .close-sheet {
+            background: #F2F2F6;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 30px;
+            font-size: 1.6rem;
+            line-height: 1;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        /* —— responsive —— */
+        @media (max-width: 640px) {
+            body { padding: 0; align-items: flex-start; }
+            #app-container { max-height: 100vh; border-radius: 0; }
+            .main-grid { padding: 8px; gap: 8px; }
+            .preview-panel { display: none; }
+            .mobile-preview-bar {
+                display: flex;
+                padding: 12px 20px 16px;
+                justify-content: center;
+                background: transparent;
+            }
+            .btn-outline {
+                background: rgba(255,255,255,0.7);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                border: 1px solid rgba(0,0,0,0.05);
+                padding: 14px 24px;
+                border-radius: 40px;
+                font-weight: 500;
+                box-shadow: var(--shadow-sm);
+                width: fit-content;
+                cursor: pointer;
+                color: var(--accent);
+            }
+            .landing-title { font-size: 2.8rem; }
+        }
+
+        /* util */
+        .text-muted { color: var(--text-secondary); }
+    </style>
 </head>
 <body>
 
-<!-- 1. LANDING PAGE -->
+<!-- LANDING -->
 <div id="landing-page">
-  <div class="landing-logo">
-    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-  </div>
-  <h1 class="landing-title">CV Profesional<br>en minutos.</h1>
-  <p class="landing-sub">IA experta que ayuda a redactar, valida tus datos y genera un PDF optimizado para ATS.</p>
-  <button class="btn-start" onclick="startApp()">Generar mi CV</button>
+    <div class="landing-title">CV·Flow</div>
+    <div class="landing-sub">Asistente conversacional · Apple clean</div>
+    <button class="btn-primary" id="start-btn">Generar mi CV</button>
 </div>
 
-<!-- 2. APP CONTAINER -->
+<!-- APP PRINCIPAL -->
 <div id="app-container">
-  <header>
-    <div class="brand">CV Pro</div>
-    <div class="progress-bar-container"><div class="progress-bar-fill" id="progressBar"></div></div>
-    <button id="btnDownload" style="background:none; border:none; font-weight:600; color:var(--accent); opacity:0.5; pointer-events:none;" onclick="downloadPDF()">
-      Descargar
-    </button>
-  </header>
+    <header class="app-header">
+        <span class="step-indicator" id="step-indicator">1/10</span>
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar" style="width: 10%;"></div>
+        </div>
+    </header>
 
-  <div class="main-grid">
-    <!-- CHAT -->
-    <section class="chat-area">
-      <div class="messages" id="messagesContainer"></div>
-      
-      <div class="input-area">
-        <textarea id="userInput" rows="1" placeholder="Escribe aquí..." oninput="resizeInput(this)" onkeydown="checkKey(event)"></textarea>
-        <button class="btn-send" id="sendBtn" onclick="handleSend()">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"></path></svg>
-        </button>
-      </div>
+    <div class="main-grid">
+        <!-- CHAT PANEL -->
+        <div class="chat-panel">
+            <div class="chat-messages" id="chat-messages"></div>
+            <div class="chat-input-area">
+                <div class="input-wrapper">
+                    <input type="text" id="user-input" placeholder="Escribe tu respuesta..." autocomplete="off" enterkeyhint="send">
+                    <button class="send-btn" id="send-btn" aria-label="Enviar">↑</button>
+                </div>
+            </div>
+        </div>
 
-      <!-- BARRA MÓVIL ACCIONES -->
-      <div class="mobile-action-bar">
-        <button class="btn-preview-action" onclick="togglePreview()">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-          Ver Vista Previa
-        </button>
-      </div>
-    </section>
+        <!-- PREVIEW (desktop) -->
+        <div class="preview-panel" id="preview-panel">
+            <div id="cv-preview-container" class="cv-preview">
+                <!-- CV dinámico -->
+            </div>
+        </div>
+    </div>
 
-    <!-- PREVIEW -->
-    <section class="preview-panel" id="previewPanel">
-      <div class="preview-header">
-        <span style="font-weight:600">Vista Previa</span>
-        <button class="close-btn" onclick="togglePreview()">Cerrar</button>
-      </div>
-      <div class="preview-scroll">
-        <div class="cv-page" id="cvContent"></div>
-      </div>
-    </section>
-  </div>
+    <!-- barra móvil para abrir preview -->
+    <div class="mobile-preview-bar">
+        <div class="btn-outline" id="open-preview-btn">👁 Vista previa del CV</div>
+    </div>
+</div>
+
+<!-- MODAL BOTTOM SHEET (móvil) -->
+<div class="modal-overlay" id="preview-modal">
+    <div class="bottom-sheet">
+        <div class="sheet-header">
+            <h3>Tu CV</h3>
+            <button class="close-sheet" id="close-modal-btn">✕</button>
+        </div>
+        <div id="modal-cv-container" class="cv-preview">
+            <!-- se renderiza igual que preview normal -->
+        </div>
+        <div style="margin-top: 20px; display: flex; gap: 12px;">
+            <button class="btn-primary" id="download-pdf-modal" style="flex:1; padding: 14px;">📄 Descargar PDF</button>
+        </div>
+    </div>
 </div>
 
 <script>
-/* ───── ESTADO ───── */
-const state = { name:'', title:'', email:'', phone:'', summary:'', skills:'', exp:[], lang:'', tools:'' };
-let currentStep = 0;
-let tempExp = {};
+    (function(){
+        "use strict";
 
-/* ───── PASOS ───── */
-const STEPS = [
-  { id:'name',    p:10, q:"¡Hola! 👋 Empecemos. ¿Cuál es tu **Nombre Completo**?" },
-  { id:'title',   p:20, q:"Genial, {name}. Ahora define tu **Título Profesional** (ej: 'Ingeniero de Software Senior')." },
-  { id:'email',   p:30, q:"Necesito tu **Email**. Recuerda incluir el '@' para que sea válido." },
-  { id:'phone',   p:40, q:"Y tu **Teléfono** de contacto." },
-  { id:'summary', p:55, q:"Escribe un breve **Resumen Profesional** (3-4 líneas). No empieces con 'Yo soy', ve directo al grano.", multi:true },
-  { id:'skills',  p:70, q:"Lista tus **Habilidades** separadas por comas (ej: Python, Inglés C1, Liderazgo)." },
-  { id:'role',    p:80, q:"Hablemos de experiencia. ¿Cuál es tu **puesto actual**?" },
-  { id:'company', p:90, q:"¿Nombre de la **Empresa** y **Fechas**?" },
-  { id:'desc',    p:95, q:"Describe tus **logros** en ese puesto. Usa números si es posible.", multi:true },
-  { id:'end',     p:100,q:"¡Increíble! 🎉 Tu CV está listo. Revisa la vista previa y descarga tu PDF.", end:true }
-];
+        // ---------- STATE & FLUJO ----------
+        const steps = [
+            { field: 'nombre', question: 'Hola, ¿cuál es tu nombre completo?', type: 'text', polish: 'nombre' },
+            { field: 'titulo', question: 'Define tu título (ej: Ingeniero Senior).', type: 'text', polish: 'titulo' },
+            { field: 'email', question: 'Tu correo electrónico.', type: 'email', polish: 'email' },
+            { field: 'telefono', question: 'Tu teléfono.', type: 'tel', polish: 'plain' },
+            { field: 'resumen', question: 'Escribe un resumen profesional (3-4 líneas). No empieces con "Yo soy".', type: 'long', polish: 'resumen' },
+            { field: 'habilidades', question: 'Lista habilidades separadas por comas.', type: 'text', polish: 'habilidades' },
+            { field: 'puesto', question: '¿Cuál es tu puesto actual?', type: 'text', polish: 'puesto' },
+            { field: 'empresaFechas', question: 'Empresa y fechas (ej: "Acme Corp | 2020–Presente")', type: 'text', polish: 'plain' },
+            { field: 'logros', question: 'Describe logros medibles.', type: 'long', polish: 'logros' }
+        ];
 
-/* ───── LÓGICA DE APP ───── */
-function startApp() {
-  document.getElementById('landing-page').classList.add('hidden');
-  const app = document.getElementById('app-container');
-  app.style.display = 'flex';
-  // Forzar reflow
-  void app.offsetWidth; 
-  app.classList.add('visible');
-  
-  setTimeout(() => {
-    runStep();
-  }, 800);
-}
+        const state = {
+            stepIndex: 0,
+            nombre: '', titulo: '', email: '', telefono: '', resumen: '',
+            habilidades: '', puesto: '', empresaFechas: '', logros: '',
+            isFinished: false,
+            errorRetry: false
+        };
 
-function runStep() {
-  const step = STEPS[currentStep];
-  document.getElementById('progressBar').style.width = step.p + '%';
-  
-  if (step.end) {
-    document.getElementById('userInput').style.display = 'none';
-    document.getElementById('sendBtn').style.display = 'none';
-    const dlBtn = document.getElementById('btnDownload');
-    dlBtn.style.opacity = '1';
-    dlBtn.style.pointerEvents = 'all';
-  }
+        // UI elements
+        const landing = document.getElementById('landing-page');
+        const app = document.getElementById('app-container');
+        const chatMessages = document.getElementById('chat-messages');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+        const stepIndicator = document.getElementById('step-indicator');
+        const progressBar = document.getElementById('progress-bar');
+        const previewContainer = document.getElementById('cv-preview-container');
+        const modalOverlay = document.getElementById('preview-modal');
+        const modalCvContainer = document.getElementById('modal-cv-container');
+        const openPreviewBtn = document.getElementById('open-preview-btn');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const downloadPdfModal = document.getElementById('download-pdf-modal');
 
-  // Simular "Escribiendo..."
-  showTyping().then(() => {
-    let msg = step.q.replace('{name}', state.name ? state.name.split(' ')[0] : '');
-    addMsg(msg, 'bot');
-  });
-}
+        // helper polish
+        function polishText(text, type) {
+            if (!text) return text;
+            let polished = text.trim();
+            if (polished === '') return polished;
 
-function showTyping() {
-  return new Promise(resolve => {
-    const d = document.createElement('div');
-    d.className = 'msg bot';
-    d.style.color = '#888';
-    d.innerHTML = '<span style="animation: blink 1s infinite">●</span>';
-    document.getElementById('messagesContainer').appendChild(d);
-    window.scrollTo(0, document.body.scrollHeight);
-    setTimeout(() => { d.remove(); resolve(); }, 800);
-  });
-}
+            // Eliminar muletillas iniciales para resumen/logros
+            if (type === 'resumen' || type === 'logros') {
+                const lower = polished.toLowerCase();
+                const prefixes = ['soy ', 'estoy ', 'tengo ', 'mi experiencia es ', 'yo soy '];
+                for (let p of prefixes) {
+                    if (lower.startsWith(p)) {
+                        polished = polished.slice(p.length);
+                        break;
+                    }
+                }
+            }
 
-function addMsg(txt, type) {
-  const div = document.createElement('div');
-  div.className = `msg ${type}`;
-  div.innerHTML = txt.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-  document.getElementById('messagesContainer').appendChild(div);
-  window.scrollTo(0, document.body.scrollHeight);
-}
+            // Capitalizar primera letra si no es email
+            if (type !== 'email' && polished.length > 0) {
+                polished = polished.charAt(0).toUpperCase() + polished.slice(1);
+            }
 
-/* ───── VALIDACIÓN INTELIGENTE ───── */
-function validateInput(stepId, val) {
-  val = val.trim();
-  if (!val) return { valid: false, msg: "Por favor, escribe algo para continuar." };
-  
-  if (stepId === 'email') {
-    if (!val.includes('@') || !val.includes('.')) {
-      return { valid: false, msg: "⚠️ El email no parece válido. Te has olvidado el '@' o el dominio." };
-    }
-  }
-  if (stepId === 'summary' && val.length < 20) {
-    return { valid: false, msg: "El resumen es muy corto. Cuéntame un poco más sobre tu experiencia." };
-  }
-  return { valid: true };
-}
+            // Asegurar punto final en resumen/logros largos (>30 chars y sin .!?)
+            if ((type === 'resumen' || type === 'logros') && polished.length > 30) {
+                if (!/[.!?]$/.test(polished)) polished += '.';
+            }
+            return polished;
+        }
 
-/* ───── PROCESAR INPUT ───── */
-function handleSend() {
-  const input = document.getElementById('userInput');
-  const val = input.value.trim();
-  if (!val) return;
+        // validación según campo
+        function validateField(value, field, type) {
+            if (!value || value.trim() === '') return 'Este campo no puede estar vacío.';
+            if (field === 'email') {
+                if (!value.includes('@') || !value.includes('.')) return 'El email debe contener "@" y un punto.';
+            }
+            if (field === 'resumen' && value.length < 20) return 'El resumen debe tener al menos 20 caracteres.';
+            if (field === 'logros' && value.length < 10) return 'Describe logros con más detalle.';
+            return null;
+        }
 
-  // 1. Validar
-  const step = STEPS[currentStep];
-  const validation = validateInput(step.id, val);
-  
-  if (!validation.valid) {
-    addMsg(validation.msg, 'error');
-    input.value = '';
-    input.focus();
-    return;
-  }
+        // actualizar preview
+        function updatePreview() {
+            const cvHtml = `
+                <div class="cv-name">${state.nombre || 'Tu Nombre'}</div>
+                <div class="cv-title">${state.titulo || 'Título profesional'}</div>
+                <div style="display:flex; gap:16px; flex-wrap:wrap; margin-bottom:12px; font-size:0.9rem;">
+                    <span>✉️ ${state.email || 'email@ejemplo.com'}</span>
+                    <span>📞 ${state.telefono || '+34 600 000 000'}</span>
+                </div>
+                <div class="cv-section-title">Resumen</div>
+                <div class="cv-text">${state.resumen || 'Resumen profesional pendiente...'}</div>
+                <div class="cv-section-title">Habilidades</div>
+                <div class="cv-text">${state.habilidades || 'Tus habilidades'}</div>
+                <div class="cv-section-title">Experiencia</div>
+                <div style="font-weight:600;">${state.puesto || 'Puesto'}</div>
+                <div class="text-muted" style="margin-bottom:6px;">${state.empresaFechas || 'Empresa · Fechas'}</div>
+                <div class="cv-text">${state.logros || 'Logros destacados.'}</div>
+                <div style="margin-top:24px; border-top:1px solid #eee;"></div>
+            `;
+            previewContainer.innerHTML = cvHtml;
+            modalCvContainer.innerHTML = cvHtml;
+        }
 
-  // 2. Mostrar usuario y limpiar
-  addMsg(val, 'user');
-  input.value = '';
-  input.style.height = 'auto';
+        // render chat
+        function addMessage(text, sender, isError = false) {
+            const div = document.createElement('div');
+            div.className = `bubble ${sender}-bubble ${isError ? 'error-bubble' : ''}`;
+            div.textContent = text;
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
 
-  // 3. Guardar y Procesar
-  saveData(step.id, val);
-  renderCV();
+        function botQuestion(question) {
+            addMessage(question, 'bot');
+        }
 
-  // 4. Siguiente paso
-  if (!step.end) {
-    currentStep++;
-    runStep();
-  }
-}
+        function userAnswer(answer) {
+            addMessage(answer, 'user');
+        }
 
-function saveData(id, val) {
-  // Pulsión simple de texto (IA Mockup)
-  let clean = val.charAt(0).toUpperCase() + val.slice(1);
-  if (id === 'summary' || id === 'desc') {
-    clean = clean.replace(/^(Soy |Estoy |Tengo |Mi experiencia es )/i, ''); // Quitar "Yo"
-    if (!clean.endsWith('.')) clean += '.';
-  }
+        function errorMessage(msg) {
+            addMessage(msg, 'bot', true);
+        }
 
-  if (id === 'role') tempExp.role = clean;
-  else if (id === 'company') tempExp.company = clean;
-  else if (id === 'desc') { tempExp.desc = clean; state.exp.push({...tempExp}); tempExp = {}; }
-  else state[id] = clean;
-}
+        function updateProgress() {
+            const total = steps.length;
+            const current = state.isFinished ? total : state.stepIndex;
+            const percent = Math.min(100, Math.round((current / total)*100));
+            progressBar.style.width = percent + '%';
+            stepIndicator.textContent = `${state.isFinished ? total : state.stepIndex}/${total}`;
+        }
 
-/* ───── RENDER CV ───── */
-function renderCV() {
-  const c = document.getElementById('cvContent');
-  const d = (t) => t ? `<div class="cv-text">${t}</div>` : '';
-  
-  c.innerHTML = `
-    <div class="cv-name">${state.name || 'Tu Nombre'}</div>
-    <div class="cv-head">
-      <div class="cv-title">${state.title || 'Tu Título'}</div>
-      <div class="cv-contact">${state.email || 'email@ejemplo.com'} | ${state.phone || '+34 600...'}</div>
-    </div>
-    ${state.summary ? `<div class="cv-section"><div class="cv-sec-title">Perfil</div>${d(state.summary)}</div>` : ''}
-    ${state.skills ? `<div class="cv-section"><div class="cv-sec-title">Habilidades</div>${d(state.skills)}</div>` : ''}
-    ${state.exp.length ? `<div class="cv-section"><div class="cv-sec-title">Experiencia</div>
-      ${state.exp.map(e => `<div class="cv-item"><div class="cv-role">${e.role} <span class="cv-date">${e.company}</span></div>${d(e.desc)}</div>`).join('')}
-    </div>` : ''}
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-      ${state.lang ? `<div><div class="cv-sec-title">Idiomas</div>${d(state.lang)}</div>` : ''}
-      ${state.tools ? `<div><div class="cv-sec-title">Herramientas</div>${d(state.tools)}</div>` : ''}
-    </div>
-  `;
-}
+        // avanzar paso
+        function processInput(rawValue) {
+            if (state.isFinished) {
+                addMessage('Ya has completado tu CV. Puedes ver la vista previa.', 'bot');
+                return;
+            }
 
-/* ───── PDF DOWNLOAD FIX ───── */
-async function downloadPDF() {
-  const btn = document.getElementById('btnDownload');
-  btn.innerText = '...';
-  
-  const el = document.getElementById('cvContent');
-  const panel = document.getElementById('previewPanel');
-  
-  // Asegurar que el panel sea visible temporalmente para el renderizado correcto
-  const wasClosed = !panel.classList.contains('open');
-  if(wasClosed) panel.classList.add('open');
+            const step = steps[state.stepIndex];
+            const field = step.field;
+            const type = step.type;
+            
+            let polished = polishText(rawValue, step.polish);
+            const validationError = validateField(polished, field, type);
+            
+            if (validationError) {
+                errorMessage(validationError + ' Intenta de nuevo.');
+                // repetir misma pregunta
+                botQuestion(step.question);
+                return;
+            }
 
-  // Activar modo A4
-  el.classList.add('pdf-mode');
-  
-  // Esperar render
-  await new Promise(r => setTimeout(r, 500));
+            // guardar
+            state[field] = polished;
+            userAnswer(polished);
+            
+            // siguiente paso
+            state.stepIndex++;
+            
+            if (state.stepIndex < steps.length) {
+                const nextStep = steps[state.stepIndex];
+                botQuestion(nextStep.question);
+            } else {
+                state.isFinished = true;
+                botQuestion('¡CV listo! Revisa la vista previa. Puedes descargarlo en PDF.');
+            }
+            
+            updatePreview();
+            updateProgress();
+        }
 
-  await html2pdf().set({
-    margin: 0,
-    filename: `CV_${state.name.replace(/\s/g,'_')}.pdf`,
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  }).from(el).save();
+        function resetAndStart() {
+            // reset state
+            state.stepIndex = 0;
+            ['nombre','titulo','email','telefono','resumen','habilidades','puesto','empresaFechas','logros'].forEach(k=> state[k]='');
+            state.isFinished = false;
+            chatMessages.innerHTML = '';
+            const firstQuestion = steps[0].question;
+            botQuestion(firstQuestion);
+            updatePreview();
+            updateProgress();
+            userInput.value = '';
+            userInput.focus();
+        }
 
-  el.classList.remove('pdf-mode');
-  if(wasClosed) panel.classList.remove('open');
-  btn.innerText = 'Descargar';
-}
+        // UI listeners
+        document.getElementById('start-btn').addEventListener('click', ()=>{
+            landing.classList.add('hidden');
+            app.classList.add('visible');
+            resetAndStart();
+        });
 
-/* ───── UTILS ───── */
-function resizeInput(el) {
-  el.style.height = 'auto';
-  el.style.height = el.scrollHeight + 'px';
-  document.getElementById('sendBtn').classList.toggle('ready', el.value.trim().length > 0);
-}
-function checkKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }
-function togglePreview() { document.getElementById('previewPanel').classList.toggle('open'); }
+        sendBtn.addEventListener('click', ()=>{
+            const val = userInput.value.trim();
+            if (!val) return;
+            processInput(val);
+            userInput.value = '';
+        });
+
+        userInput.addEventListener('keypress', (e)=>{
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendBtn.click();
+            }
+        });
+
+        // modal mobile
+        openPreviewBtn.addEventListener('click', ()=>{
+            modalOverlay.classList.add('active');
+            updatePreview(); // asegura sincro
+        });
+        closeModalBtn.addEventListener('click', ()=>{
+            modalOverlay.classList.remove('active');
+        });
+        modalOverlay.addEventListener('click', (e)=>{
+            if (e.target === modalOverlay) modalOverlay.classList.remove('active');
+        });
+
+        // PDF: solución exacta
+        async function downloadPDF() {
+            const container = previewContainer; // usamos el mismo contenedor
+            const originalClasses = container.className;
+            
+            // añadir pdf-mode
+            container.classList.add('pdf-mode');
+            
+            // esperar 500ms render
+            await new Promise(r => setTimeout(r, 500));
+            
+            const opt = {
+                margin:        [0.5, 0.5, 0.5, 0.5],
+                filename:      `CV_${state.nombre || 'perfil'}.pdf`,
+                image:         { type: 'jpeg', quality: 0.98 },
+                html2canvas:   { scale: 2, letterRendering: true, useCORS: true },
+                jsPDF:         { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            
+            try {
+                await html2pdf().set(opt).from(container).save();
+            } catch (e) {
+                alert('Error generando PDF');
+            }
+            
+            container.classList.remove('pdf-mode');
+            container.className = originalClasses;
+        }
+
+        downloadPdfModal.addEventListener('click', (e)=>{
+            e.stopPropagation();
+            downloadPDF();
+        });
+
+        // también se puede añadir un botón en preview desktop (opcional pero no necesario)
+        // creamos un pequeño botón flotante dentro del preview panel
+        const previewPanel = document.getElementById('preview-panel');
+        const pdfBtnDesktop = document.createElement('button');
+        pdfBtnDesktop.textContent = '⬇ PDF';
+        pdfBtnDesktop.style.cssText = 'margin-top:16px; background: #007AFF; color:white; border:none; padding:12px; border-radius:40px; font-weight:500; cursor:pointer;';
+        pdfBtnDesktop.addEventListener('click', downloadPDF);
+        previewPanel.appendChild(pdfBtnDesktop);
+
+        // actualizar preview al inicio
+        updatePreview();
+        
+        // Si se cierra modal sin descargar
+        window.addEventListener('keydown', (e) => { if(e.key==='Escape') modalOverlay.classList.remove('active'); });
+    })();
 </script>
 </body>
 </html>
+```
