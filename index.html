@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CV Builder — Profesional</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+  /* ─── RESET & BASE ─────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #F7F7F5;
+    --surface:   #FFFFFF;
+    --border:    #E8E8E4;
+    --border-mid:#D0D0CA;
+    --ink:       #0D0D0D;
+    --ink-2:     #3A3A38;
+    --ink-3:     #7A7A75;
+    --ink-4:     #ADADAA;
+    --accent:    #0D0D0D;
+    --pill-bg:   #EFEFEC;
+
+    --chat-user-bg: #0D0D0D;
+    --chat-user-ink:#FFFFFF;
+    --chat-bot-bg:  #FFFFFF;
+    --chat-bot-ink: #0D0D0D;
+
+    --radius-sm: 10px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+
+    --font-body: 'DM Sans', system-ui, sans-serif;
+    --font-display: 'DM Serif Display', Georgia, serif;
+
+    --progress-h: 3px;
+    --ease: cubic-bezier(.4,0,.2,1);
+  }
+
+  html, body {
+    height: 100%;
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ─── LAYOUT ───────────────────────────────────────────── */
+  .app {
+    display: grid;
+    grid-template-rows: var(--progress-h) 52px 1fr;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ─── PROGRESS BAR ─────────────────────────────────────── */
+  .progress-track {
+    background: var(--border);
+    width: 100%;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--ink);
+    width: 0%;
+    transition: width .6s var(--ease);
+  }
+
+  /* ─── TOPBAR ───────────────────────────────────────────── */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(247,247,245,.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    position: relative;
+    z-index: 10;
+  }
+  .topbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+  .topbar-icon {
+    width: 22px; height: 22px;
+    border: 1.5px solid var(--ink);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .topbar-icon svg { width: 11px; height: 11px; }
+  .topbar-name {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -.02em;
+    color: var(--ink);
+  }
+  .topbar-step {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--ink-3);
+    letter-spacing: 0.01em;
+  }
+  .btn-download {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--ink);
+    color: #fff;
+    border: none;
+    border-radius: 100px;
+    padding: 8px 18px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    opacity: .35;
+    pointer-events: none;
+    transition: opacity .25s, transform .15s;
+    letter-spacing: -.01em;
+  }
+  .btn-download.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .btn-download:hover { transform: scale(1.03); }
+  .btn-download svg { width: 14px; height: 14px; }
+
+  /* ─── MAIN CONTENT ─────────────────────────────────────── */
+  .main {
+    display: grid;
+    grid-template-columns: 60fr 40fr;
+    overflow: hidden;
+  }
+
+  /* ─── CHAT PANEL ───────────────────────────────────────── */
+  .chat-panel {
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border);
+    overflow: hidden;
+    background: var(--bg);
+  }
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 32px 36px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    scroll-behavior: smooth;
+  }
+  .chat-messages::-webkit-scrollbar { width: 4px; }
+  .chat-messages::-webkit-scrollbar-track { background: transparent; }
+  .chat-messages::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 4px; }
+
+  /* Bubble */
+  .bubble {
+    max-width: 75%;
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    font-size: 14.5px;
+    line-height: 1.6;
+    animation: bubbleIn .3s var(--ease) both;
+    position: relative;
+  }
+  @keyframes bubbleIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .bubble-bot {
+    background: var(--chat-bot-bg);
+    color: var(--chat-bot-ink);
+    border: 1px solid var(--border);
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+  }
+  .bubble-user {
+    background: var(--chat-user-bg);
+    color: var(--chat-user-ink);
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+  }
+  .bubble-hint {
+    font-size: 12px;
+    color: var(--ink-3);
+    align-self: flex-start;
+    padding: 0 4px;
+    animation: bubbleIn .3s var(--ease) both;
+  }
+  .typing-indicator {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 14px 16px;
+    background: var(--chat-bot-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    border-bottom-left-radius: 4px;
+    align-self: flex-start;
+    animation: bubbleIn .2s var(--ease) both;
+  }
+  .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--ink-4);
+    animation: dotBounce 1.2s infinite;
+  }
+  .dot:nth-child(2) { animation-delay: .2s; }
+  .dot:nth-child(3) { animation-delay: .4s; }
+  @keyframes dotBounce {
+    0%,80%,100% { transform: translateY(0); background: var(--ink-4); }
+    40%         { transform: translateY(-5px); background: var(--ink-2); }
+  }
+
+  /* Quick-reply chips */
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-self: flex-start;
+    animation: bubbleIn .35s var(--ease) .1s both;
+  }
+  .chip {
+    background: var(--surface);
+    border: 1px solid var(--border-mid);
+    border-radius: 100px;
+    padding: 8px 16px;
+    font-size: 13.5px;
+    font-family: var(--font-body);
+    font-weight: 500;
+    color: var(--ink-2);
+    cursor: pointer;
+    transition: background .15s, border-color .15s, color .15s;
+  }
+  .chip:hover {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: #fff;
+  }
+
+  /* ─── INPUT AREA ───────────────────────────────────────── */
+  .chat-input-area {
+    padding: 16px 36px 20px;
+    border-top: 1px solid var(--border);
+    background: var(--bg);
+  }
+  .input-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border-mid);
+    border-radius: var(--radius-md);
+    padding: 10px 12px 10px 16px;
+    transition: border-color .2s;
+  }
+  .input-row:focus-within {
+    border-color: var(--ink);
+  }
+  .chat-textarea {
+    flex: 1;
+    border: none;
+    background: transparent;
+    resize: none;
+    font-family: var(--font-body);
+    font-size: 14.5px;
+    color: var(--ink);
+    line-height: 1.5;
+    max-height: 120px;
+    outline: none;
+    min-height: 24px;
+  }
+  .chat-textarea::placeholder { color: var(--ink-4); }
+  .btn-send {
+    width: 34px; height: 34px;
+    border-radius: 10px;
+    background: var(--ink);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: transform .15s, opacity .2s;
+    opacity: .5;
+  }
+  .btn-send.ready { opacity: 1; }
+  .btn-send:hover { transform: scale(1.08); }
+  .btn-send svg { width: 14px; height: 14px; fill: #fff; }
+  .input-helper {
+    margin-top: 8px;
+    font-size: 11.5px;
+    color: var(--ink-4);
+    text-align: center;
+  }
+
+  /* ─── CV PREVIEW PANEL ─────────────────────────────────── */
+  .preview-panel {
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .preview-header {
+    padding: 16px 24px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .preview-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .preview-badge {
+    font-size: 11px;
+    color: var(--ink-4);
+    background: var(--pill-bg);
+    padding: 3px 9px;
+    border-radius: 100px;
+  }
+  .preview-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+  }
+  .preview-scroll::-webkit-scrollbar { width: 4px; }
+  .preview-scroll::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 4px; }
+
+  /* A4 Canvas */
+  .cv-a4 {
+    width: 100%;
+    max-width: 440px;
+    aspect-ratio: 210 / 297;
+    background: #fff;
+    box-shadow: 0 2px 24px rgba(0,0,0,.10), 0 0 0 1px rgba(0,0,0,.05);
+    border-radius: 4px;
+    padding: 40px 36px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 8.5px;
+    color: #111;
+    overflow: hidden;
+    position: relative;
+    transition: all .3s var(--ease);
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  /* CV Sections */
+  .cv-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    letter-spacing: -.02em;
+    line-height: 1.1;
+    color: #000;
+    margin-bottom: 2px;
+    transition: all .3s var(--ease);
+  }
+  .cv-title {
+    font-size: 9px;
+    font-weight: 500;
+    color: #444;
+    letter-spacing: .02em;
+    margin-bottom: 10px;
+    transition: all .3s var(--ease);
+  }
+  .cv-contact-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    font-size: 7.5px;
+    color: #555;
+    padding-bottom: 10px;
+    border-bottom: 1.5px solid #000;
+    margin-bottom: 10px;
+  }
+  .cv-contact-item { display: flex; align-items: center; gap: 3px; }
+  .cv-section {
+    margin-bottom: 10px;
+    transition: all .3s var(--ease);
+    animation: fadeSlide .4s var(--ease) both;
+  }
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .cv-section-title {
+    font-size: 7px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: #000;
+    border-bottom: .75px solid #000;
+    padding-bottom: 2px;
+    margin-bottom: 6px;
+  }
+  .cv-summary-text {
+    font-size: 8px;
+    line-height: 1.6;
+    color: #333;
+  }
+  .cv-skills-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px 6px;
+    font-size: 7.5px;
+    color: #333;
+  }
+  .cv-skill-tag {
+    background: #F0F0EE;
+    padding: 1.5px 6px;
+    border-radius: 2px;
+    font-size: 7px;
+  }
+  .cv-exp-item { margin-bottom: 6px; }
+  .cv-exp-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 1px;
+  }
+  .cv-exp-role {
+    font-size: 8.5px;
+    font-weight: 600;
+    color: #000;
+  }
+  .cv-exp-dates {
+    font-size: 7px;
+    color: #666;
+    white-space: nowrap;
+  }
+  .cv-exp-company {
+    font-size: 7.5px;
+    color: #555;
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+  .cv-exp-desc {
+    font-size: 7.5px;
+    line-height: 1.55;
+    color: #333;
+  }
+  .cv-edu-item { margin-bottom: 4px; }
+  .cv-edu-degree { font-size: 8.5px; font-weight: 600; }
+  .cv-edu-school { font-size: 7.5px; color: #555; }
+  .cv-edu-year { font-size: 7px; color: #777; }
+  .cv-extras-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  .cv-extras-label { font-size: 7px; font-weight: 700; color: #000; margin-bottom: 2px; text-transform: uppercase; letter-spacing: .08em; }
+  .cv-extras-val { font-size: 7.5px; color: #333; line-height: 1.5; }
+  .cv-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 10px;
+    color: #CACAC8;
+  }
+  .cv-placeholder svg { width: 28px; height: 28px; opacity: .4; }
+  .cv-placeholder-text { font-size: 9px; letter-spacing: .05em; text-transform: uppercase; }
+
+  /* ─── EMPTY STATE ──────────────────────────────────────── */
+  .cv-empty {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    opacity: .35;
+  }
+
+  /* ─── RESPONSIVE ───────────────────────────────────────── */
+  @media (max-width: 768px) {
+    .main { grid-template-columns: 1fr; }
+    .preview-panel { display: none; }
+    .topbar { padding: 0 16px; }
+    .chat-messages { padding: 20px 16px 12px; }
+    .chat-input-area { padding: 12px 16px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+
+  <!-- PROGRESS BAR -->
+  <div class="progress-track">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-brand">
+      <div class="topbar-icon">
+        <svg viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="1" y="1" width="9" height="1.5" rx=".75" fill="#0D0D0D"/>
+          <rect x="1" y="4.25" width="6" height="1.5" rx=".75" fill="#0D0D0D"/>
+          <rect x="1" y="7.5" width="7.5" height="1.5" rx=".75" fill="#0D0D0D"/>
+        </svg>
+      </div>
+      <span class="topbar-name">CV Builder</span>
+    </div>
+    <span class="topbar-step" id="topbarStep">Paso 1 de 9</span>
+    <button class="btn-download" id="btnDownload" onclick="downloadPDF()">
+      <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M7 1v8M4 6.5l3 3 3-3M2 11h10" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Descargar PDF
+    </button>
+  </header>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- ── CHAT PANEL ── -->
+    <section class="chat-panel">
+      <div class="chat-messages" id="chatMessages"></div>
+      <div class="chat-input-area">
+        <div class="input-row">
+          <textarea
+            class="chat-textarea"
+            id="chatInput"
+            rows="1"
+            placeholder="Escribe tu respuesta…"
+            onkeydown="handleKey(event)"
+            oninput="autoResize(this); toggleSend()"
+          ></textarea>
+          <button class="btn-send" id="btnSend" onclick="submitInput()">
+            <svg viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7 12V2M2.5 6.5L7 2l4.5 4.5" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            </svg>
+          </button>
+        </div>
+        <p class="input-helper">Pulsa Enter para enviar · Shift+Enter para nueva línea</p>
+      </div>
+    </section>
+
+    <!-- ── CV PREVIEW PANEL ── -->
+    <section class="preview-panel">
+      <div class="preview-header">
+        <span class="preview-label">Vista Previa</span>
+        <span class="preview-badge" id="previewBadge">En blanco</span>
+      </div>
+      <div class="preview-scroll">
+        <div class="cv-a4" id="cvPreview">
+          <div class="cv-empty" id="cvEmpty">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V9l-6-6z" stroke="#0D0D0D" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M14 3v6h6M8 13h8M8 17h5" stroke="#0D0D0D" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <span class="cv-placeholder-text">Tu CV aparecerá aquí</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ═══════════════════════════════════════════════════════════
+     JAVASCRIPT — Chat Wizard Logic
+═══════════════════════════════════════════════════════════ -->
+<script>
+/* ──────────────────────────────────────────────
+   STATE — el objeto central de toda la entrevista
+   ────────────────────────────────────────────── */
+const state = {
+  name: '',
+  email: '',
+  phone: '',
+  location: '',
+  linkedin: '',
+  title: '',
+  summary: '',
+  skills: [],
+  experience: [],     // [{role, company, dates, description}]
+  education: [],      // [{degree, school, year}]
+  languages: '',
+  tools: '',
+};
+
+// Experiencia temporal mientras se recopila
+let currentExp = {};
+let currentEdu = {};
+let expCount = 0;
+let eduCount = 0;
+
+/* ──────────────────────────────────────────────
+   WIZARD STEPS — definición granular de cada paso
+   step: identificador único
+   progress: % para la barra
+   botMsg: mensaje del bot
+   hint: texto de ayuda debajo del campo
+   field: campo del state a rellenar (o null si es especial)
+   chips: opciones rápidas (opcional)
+   ────────────────────────────────────────────── */
+const STEPS = [
+  /* 0 */ {
+    step: 'welcome',
+    progress: 0,
+    label: 'Bienvenida',
+    botMsg: '👋 Hola, soy tu experto en CV. Vamos a construir uno profesional, limpio y optimizado para ATS.\n\n¿Cómo te llamas? Empieza con tu nombre completo.',
+    hint: 'Ej: María García López',
+    field: 'name',
+  },
+  /* 1 */ {
+    step: 'email',
+    progress: 10,
+    label: 'Contacto',
+    botMsg: 'Perfecto, {name}. 🎯\n\nAhora tu email profesional.',
+    hint: 'Ej: maria@email.com',
+    field: 'email',
+  },
+  /* 2 */ {
+    step: 'phone',
+    progress: 12,
+    label: 'Contacto',
+    botMsg: '¿Y tu número de teléfono?',
+    hint: 'Ej: +34 600 000 000',
+    field: 'phone',
+  },
+  /* 3 */ {
+    step: 'location',
+    progress: 14,
+    label: 'Contacto',
+    botMsg: '¿Dónde estás ubicado/a? (ciudad y país).',
+    hint: 'Ej: Barcelona, España',
+    field: 'location',
+  },
+  /* 4 */ {
+    step: 'linkedin',
+    progress: 16,
+    label: 'Contacto',
+    botMsg: '¿Tienes perfil de LinkedIn? (opcional — puedes escribir «no» para saltarlo)',
+    hint: 'Ej: linkedin.com/in/mariagarcia',
+    field: 'linkedin',
+    optional: true,
+  },
+  /* 5 */ {
+    step: 'title',
+    progress: 22,
+    label: 'Titular',
+    botMsg: '¡Contacto listo! ✅\n\nAhora el **titular profesional** — esa frase poderosa que te define. Sé específico/a con tu rol y valor.\n\nEj: «Directora de Marketing Digital con 8 años escalando marcas B2C».',
+    hint: 'Tu titular debe ser concreto y cuantificable',
+    field: 'title',
+  },
+  /* 6 */ {
+    step: 'summary',
+    progress: 32,
+    label: 'Resumen',
+    botMsg: '💬 Escribe tu **resumen profesional** (3-5 líneas). Habla de tu especialidad, tus logros más importantes y qué aportas. Escribe en primera persona implícita (sin "Yo").',
+    hint: 'Concéntrate en tu propuesta de valor única',
+    field: 'summary',
+    multiline: true,
+  },
+  /* 7 */ {
+    step: 'skills',
+    progress: 42,
+    label: 'Habilidades',
+    botMsg: '⚡ Lista tus **habilidades clave** separadas por comas. Mezcla hard skills y soft skills.\n\nEj: Liderazgo de equipos, Python, SQL, Inglés C1, Gestión ágil de proyectos.',
+    hint: 'Entre 5 y 12 habilidades es ideal para ATS',
+    field: 'skills',
+  },
+  /* 8 */ {
+    step: 'exp_role',
+    progress: 50,
+    label: 'Experiencia',
+    botMsg: '💼 Empecemos con tu experiencia. ¿Cuál es (o fue) tu **puesto de trabajo más reciente**?',
+    hint: 'Ej: Product Manager Senior',
+    field: null, // especial — se gestiona aparte
+  },
+  /* 9 */ {
+    step: 'exp_company',
+    progress: 53,
+    label: 'Experiencia',
+    botMsg: '¿En qué empresa?',
+    hint: 'Ej: Accenture',
+    field: null,
+  },
+  /* 10 */ {
+    step: 'exp_dates',
+    progress: 56,
+    label: 'Experiencia',
+    botMsg: '¿Cuáles fueron las fechas? (inicio — fin o «Actualidad»)',
+    hint: 'Ej: Ene 2021 – Actualidad',
+    field: null,
+  },
+  /* 11 */ {
+    step: 'exp_desc',
+    progress: 60,
+    label: 'Experiencia',
+    botMsg: '📝 Describe tus **responsabilidades y logros medibles** en ese puesto.\n\n💡 Tip: Usa verbos de acción: *Lideré, Aumenté, Reduje, Implementé, Desarrollé, Coordiné, Optimicé…* e incluye números.',
+    hint: 'Ej: Lideré un equipo de 8 personas y aumenté las ventas un 34% en 12 meses.',
+    field: null,
+    multiline: true,
+  },
+  /* 12 */ {
+    step: 'exp_more',
+    progress: 64,
+    label: 'Experiencia',
+    botMsg: '¿Tienes otro trabajo relevante que quieras añadir?',
+    hint: null,
+    field: null,
+    chips: ['✅ Sí, añadir otro', '➡️ No, continuar'],
+  },
+  /* 13 */ {
+    step: 'edu_degree',
+    progress: 80,
+    label: 'Formación',
+    botMsg: '🎓 Formación académica. ¿Cuál es tu **titulación más relevante**?',
+    hint: 'Ej: Grado en Administración de Empresas',
+    field: null,
+  },
+  /* 14 */ {
+    step: 'edu_school',
+    progress: 83,
+    label: 'Formación',
+    botMsg: '¿En qué universidad o centro?',
+    hint: 'Ej: Universidad Autónoma de Barcelona',
+    field: null,
+  },
+  /* 15 */ {
+    step: 'edu_year',
+    progress: 86,
+    label: 'Formación',
+    botMsg: '¿Año de finalización?',
+    hint: 'Ej: 2018 (o «En curso»)',
+    field: null,
+  },
+  /* 16 */ {
+    step: 'languages',
+    progress: 92,
+    label: 'Extras',
+    botMsg: '🌍 **Idiomas** — indica cada idioma y tu nivel.\n\nEj: Español (nativo), Inglés (C1 — avanzado), Francés (B2).',
+    hint: 'Separa cada idioma con coma o punto y coma',
+    field: 'languages',
+  },
+  /* 17 */ {
+    step: 'tools',
+    progress: 96,
+    label: 'Herramientas',
+    botMsg: '🛠️ **Herramientas y Tecnologías** — ¿con qué software, plataformas o tecnologías trabajas habitualmente?',
+    hint: 'Ej: Salesforce, HubSpot, Jira, Figma, Google Analytics, Office 365',
+    field: 'tools',
+  },
+  /* 18 */ {
+    step: 'done',
+    progress: 100,
+    label: 'Completado',
+    botMsg: '🎉 ¡Todo listo! Tu CV está completo y optimizado. Revisa la vista previa a la derecha.\n\nCuando estés satisfecho/a, pulsa **«Descargar PDF»** en la barra superior para guardar tu CV profesional.',
+    field: null,
+  },
+];
+
+let currentStepIdx = 0;       // índice en STEPS
+let waitingForChip = false;   // si estamos esperando chip de sí/no
+let addingMoreExp = false;    // para el loop de experiencia
+
+/* ──────────────────────────────────────────────
+   OPTIMIZADOR DE TEXTO (simula IA)
+   Limpia, capitaliza y pule el texto del usuario
+   ────────────────────────────────────────────── */
+function optimizeText(text) {
+  if (!text) return text;
+  let t = text.trim();
+  // Capitaliza primera letra
+  t = t.charAt(0).toUpperCase() + t.slice(1);
+  // Elimina espacios múltiples
+  t = t.replace(/\s{2,}/g, ' ');
+  // Asegura punto final en párrafos largos
+  if (t.length > 40 && !/[.!?]$/.test(t)) {
+    // No añadir punto a habilidades/herramientas (contienen comas)
+    if (!t.includes(',')) t += '.';
+  }
+  return t;
+}
+
+function optimizeList(text) {
+  return text.split(/[,;]+/)
+    .map(s => s.trim())
+    .filter(Boolean)
+    .map(s => s.charAt(0).toUpperCase() + s.slice(1));
+}
+
+/* ──────────────────────────────────────────────
+   CHAT UI HELPERS
+   ────────────────────────────────────────────── */
+const chatMessages = document.getElementById('chatMessages');
+const chatInput    = document.getElementById('chatInput');
+const btnSend      = document.getElementById('btnSend');
+const progressFill = document.getElementById('progressFill');
+const topbarStep   = document.getElementById('topbarStep');
+const btnDownload  = document.getElementById('btnDownload');
+const previewBadge = document.getElementById('previewBadge');
+
+function scrollChat() {
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function addBubble(text, type = 'bot', delay = 0) {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = `bubble bubble-${type}`;
+      // Parsear negritas con **...**
+      el.innerHTML = text
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.+?)\*/g, '<em>$1</em>')
+        .replace(/\n/g, '<br>');
+      chatMessages.appendChild(el);
+      scrollChat();
+      resolve(el);
+    }, delay);
+  });
+}
+
+function addHint(text) {
+  const el = document.createElement('div');
+  el.className = 'bubble-hint';
+  el.textContent = `💡 ${text}`;
+  chatMessages.appendChild(el);
+  scrollChat();
+}
+
+function addChips(options, onSelect) {
+  const wrap = document.createElement('div');
+  wrap.className = 'chips';
+  waitingForChip = true;
+  options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'chip';
+    btn.textContent = opt;
+    btn.onclick = () => {
+      wrap.remove();
+      waitingForChip = false;
+      onSelect(opt);
+    };
+    wrap.appendChild(btn);
+  });
+  chatMessages.appendChild(wrap);
+  scrollChat();
+}
+
+async function showTyping(ms = 700) {
+  const el = document.createElement('div');
+  el.className = 'typing-indicator';
+  el.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+  chatMessages.appendChild(el);
+  scrollChat();
+  await wait(ms);
+  el.remove();
+}
+
+function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function toggleSend() {
+  const v = chatInput.value.trim();
+  btnSend.classList.toggle('ready', v.length > 0);
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    submitInput();
+  }
+}
+
+function setProgress(pct) {
+  progressFill.style.width = pct + '%';
+}
+
+/* ──────────────────────────────────────────────
+   WIZARD ENGINE — avanza paso a paso
+   ────────────────────────────────────────────── */
+async function goToStep(idx) {
+  if (idx >= STEPS.length) return;
+  currentStepIdx = idx;
+  const step = STEPS[idx];
+
+  // Actualizar barra y topbar
+  setProgress(step.progress);
+  topbarStep.textContent = `${step.label} · ${step.progress}%`;
+
+  // Mostrar indicador de escritura
+  await showTyping(550 + Math.random() * 250);
+
+  // Interpolar {name} en el mensaje
+  const msg = step.botMsg.replace('{name}', state.name.split(' ')[0]);
+  await addBubble(msg, 'bot');
+
+  // Mostrar hint si existe
+  if (step.hint) addHint(step.hint);
+
+  // Mostrar chips si el paso los tiene
+  if (step.chips) {
+    chatInput.style.display = 'none'; // ocultar input cuando hay chips
+    btnSend.style.display = 'none';
+    addChips(step.chips, handleChipResponse);
+  } else if (step.step === 'done') {
+    // Paso final: ocultar input, activar botón descarga
+    chatInput.style.display = 'none';
+    btnSend.style.display = 'none';
+    btnDownload.classList.add('active');
+    previewBadge.textContent = 'Listo para descargar';
+  } else {
+    chatInput.style.display = '';
+    btnSend.style.display = '';
+    chatInput.placeholder = step.hint || 'Escribe aquí…';
+    chatInput.focus();
+  }
+}
+
+/* Maneja la respuesta a chips (Sí/No para más experiencia) */
+async function handleChipResponse(choice) {
+  const isYes = choice.includes('Sí');
+  await addBubble(choice, 'user');
+
+  if (currentStepIdx === STEPS.findIndex(s => s.step === 'exp_more')) {
+    if (isYes) {
+      // Loop: volver al inicio de exp
+      addingMoreExp = true;
+      currentExp = {};
+      const expRoleIdx = STEPS.findIndex(s => s.step === 'exp_role');
+      await goToStep(expRoleIdx);
+    } else {
+      // Continuar con educación
+      const eduIdx = STEPS.findIndex(s => s.step === 'edu_degree');
+      await goToStep(eduIdx);
+    }
+  }
+}
+
+/* Procesa el input del usuario */
+async function submitInput() {
+  const raw = chatInput.value.trim();
+  if (!raw && !waitingForChip) return;
+
+  chatInput.value = '';
+  chatInput.style.height = 'auto';
+  btnSend.classList.remove('ready');
+
+  const step = STEPS[currentStepIdx];
+
+  // Muestra la burbuja del usuario
+  await addBubble(raw, 'user');
+
+  // Guardar valor en state según el paso
+  await processAnswer(step, raw);
+
+  // Actualizar la vista previa
+  renderPreview();
+
+  // Siguiente paso
+  const nextIdx = getNextStepIdx(currentStepIdx, raw);
+  if (nextIdx !== null) {
+    await goToStep(nextIdx);
+  }
+}
+
+async function processAnswer(step, raw) {
+  const val = optimizeText(raw);
+
+  switch (step.step) {
+    case 'welcome':  state.name     = val; break;
+    case 'email':    state.email    = val.toLowerCase(); break;
+    case 'phone':    state.phone    = val; break;
+    case 'location': state.location = val; break;
+    case 'linkedin':
+      state.linkedin = (raw.toLowerCase() === 'no' || raw.toLowerCase() === 'skip') ? '' : val;
+      break;
+    case 'title':   state.title   = val; break;
+    case 'summary': state.summary = val; break;
+    case 'skills':  state.skills  = optimizeList(raw); break;
+
+    /* Experiencia — acumular en objeto temporal */
+    case 'exp_role':    currentExp.role        = val; break;
+    case 'exp_company': currentExp.company     = val; break;
+    case 'exp_dates':   currentExp.dates       = val; break;
+    case 'exp_desc':
+      currentExp.description = val;
+      state.experience.push({ ...currentExp });
+      currentExp = {};
+      expCount++;
+      break;
+
+    /* Formación */
+    case 'edu_degree': currentEdu.degree = val; break;
+    case 'edu_school': currentEdu.school = val; break;
+    case 'edu_year':
+      currentEdu.year = val;
+      state.education.push({ ...currentEdu });
+      currentEdu = {};
+      break;
+
+    case 'languages': state.languages = val; break;
+    case 'tools':     state.tools     = val; break;
+  }
+}
+
+/* Calcula el siguiente índice de step — maneja el loop de experiencia */
+function getNextStepIdx(idx, raw) {
+  // Si estamos en exp_desc y venimos de "añadir más", volver al prompt de ¿más exp?
+  if (STEPS[idx].step === 'exp_desc') {
+    return STEPS.findIndex(s => s.step === 'exp_more');
+  }
+  return idx + 1 < STEPS.length ? idx + 1 : null;
+}
+
+/* ──────────────────────────────────────────────
+   CV RENDERER — actualiza la vista previa A4
+   ────────────────────────────────────────────── */
+function renderPreview() {
+  const cv = document.getElementById('cvPreview');
+  const empty = document.getElementById('cvEmpty');
+
+  // Una vez que tenemos nombre, mostramos el CV
+  if (!state.name) return;
+  if (empty) empty.style.display = 'none';
+  previewBadge.textContent = 'Actualizando…';
+
+  const hasContact = state.email || state.phone || state.location || state.linkedin;
+  const hasSkills  = state.skills.length > 0;
+  const hasExp     = state.experience.length > 0;
+  const hasEdu     = state.education.length > 0;
+  const hasExtras  = state.languages || state.tools;
+
+  cv.innerHTML = `
+    <!-- NOMBRE Y TITULAR -->
+    <div class="cv-name">${esc(state.name)}</div>
+    ${state.title ? `<div class="cv-title">${esc(state.title)}</div>` : ''}
+
+    <!-- CONTACTO -->
+    ${hasContact ? `
+    <div class="cv-contact-row">
+      ${state.email    ? `<span class="cv-contact-item">✉ ${esc(state.email)}</span>` : ''}
+      ${state.phone    ? `<span class="cv-contact-item">☏ ${esc(state.phone)}</span>` : ''}
+      ${state.location ? `<span class="cv-contact-item">⌖ ${esc(state.location)}</span>` : ''}
+      ${state.linkedin ? `<span class="cv-contact-item">in ${esc(state.linkedin)}</span>` : ''}
+    </div>` : '<div style="border-bottom:1.5px solid #000;margin-bottom:10px;"></div>'}
+
+    <!-- RESUMEN -->
+    ${state.summary ? `
+    <div class="cv-section">
+      <div class="cv-section-title">Perfil Profesional</div>
+      <div class="cv-summary-text">${esc(state.summary)}</div>
+    </div>` : ''}
+
+    <!-- HABILIDADES -->
+    ${hasSkills ? `
+    <div class="cv-section">
+      <div class="cv-section-title">Habilidades</div>
+      <div class="cv-skills-list">
+        ${state.skills.map(s => `<span class="cv-skill-tag">${esc(s)}</span>`).join('')}
+      </div>
+    </div>` : ''}
+
+    <!-- EXPERIENCIA -->
+    ${hasExp ? `
+    <div class="cv-section">
+      <div class="cv-section-title">Experiencia Profesional</div>
+      ${state.experience.map(exp => `
+        <div class="cv-exp-item">
+          <div class="cv-exp-header">
+            <span class="cv-exp-role">${esc(exp.role)}</span>
+            <span class="cv-exp-dates">${esc(exp.dates)}</span>
+          </div>
+          <div class="cv-exp-company">${esc(exp.company)}</div>
+          <div class="cv-exp-desc">${esc(exp.description)}</div>
+        </div>
+      `).join('')}
+    </div>` : ''}
+
+    <!-- FORMACIÓN -->
+    ${hasEdu ? `
+    <div class="cv-section">
+      <div class="cv-section-title">Formación Académica</div>
+      ${state.education.map(edu => `
+        <div class="cv-edu-item">
+          <div class="cv-edu-degree">${esc(edu.degree)}</div>
+          <div class="cv-edu-school">${esc(edu.school)}</div>
+          <div class="cv-edu-year">${esc(edu.year)}</div>
+        </div>
+      `).join('')}
+    </div>` : ''}
+
+    <!-- IDIOMAS Y HERRAMIENTAS -->
+    ${hasExtras ? `
+    <div class="cv-section">
+      <div class="cv-section-title">Información Adicional</div>
+      <div class="cv-extras-grid">
+        ${state.languages ? `
+        <div>
+          <div class="cv-extras-label">Idiomas</div>
+          <div class="cv-extras-val">${esc(state.languages)}</div>
+        </div>` : ''}
+        ${state.tools ? `
+        <div>
+          <div class="cv-extras-label">Herramientas</div>
+          <div class="cv-extras-val">${esc(state.tools)}</div>
+        </div>` : ''}
+      </div>
+    </div>` : ''}
+  `;
+
+  setTimeout(() => {
+    previewBadge.textContent = hasExp ? 'En progreso' : 'Iniciado';
+  }, 300);
+}
+
+/* Escapa HTML para prevenir XSS en el renderizado */
+function esc(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+/* ──────────────────────────────────────────────
+   PDF DOWNLOAD — usa html2pdf.js
+   ────────────────────────────────────────────── */
+async function downloadPDF() {
+  const cv = document.getElementById('cvPreview');
+  const btn = document.getElementById('btnDownload');
+  btn.textContent = 'Generando…';
+  btn.style.opacity = '.6';
+  btn.style.pointerEvents = 'none';
+
+  const opt = {
+    margin:       0,
+    filename:     `CV_${state.name.replace(/\s+/g, '_')}.pdf`,
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { scale: 3, useCORS: true, backgroundColor: '#ffffff' },
+    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak:    { mode: 'avoid-all' },
+  };
+
+  await html2pdf().set(opt).from(cv).save();
+
+  await wait(800);
+  btn.innerHTML = `<svg viewBox="0 0 14 14" fill="none"><path d="M7 1v8M4 6.5l3 3 3-3M2 11h10" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Descargar PDF`;
+  btn.style.opacity = '1';
+  btn.style.pointerEvents = 'all';
+}
+
+/* ──────────────────────────────────────────────
+   INIT — arranca el wizard al cargar la página
+   ────────────────────────────────────────────── */
+async function init() {
+  await wait(400); // pequeño delay de entrada
+  await goToStep(0);
+}
+
+init();
+</script>
+</body>
+</html>
